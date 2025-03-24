@@ -452,13 +452,17 @@ name = "fg-sdk-hackathon"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "bytes",
  "clap",
  "evdev",
  "foxglove",
  "glam",
  "noise",
+ "parking_lot",
  "rand 0.9.0",
  "rand_chacha",
+ "serde",
+ "serde_json",
  "tokio",
 ]
 
