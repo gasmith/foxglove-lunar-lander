@@ -59,6 +59,11 @@ impl Lander {
         }
     }
 
+    pub fn stop(&mut self) {
+        self.velocity = Vec3::ZERO;
+        self.angular_velocity = Vec3::ZERO;
+    }
+
     pub fn step(&mut self, dt: f32, controls: &Controls) {
         // Gravity.
         self.velocity += MOON_GRAVITY * dt;

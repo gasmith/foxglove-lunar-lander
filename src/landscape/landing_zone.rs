@@ -48,8 +48,8 @@ impl LandingZone {
         }
     }
 
-    pub fn log(&self) {
-        LANDING_ZONE_FT.log(&self.frame_transform);
-        LANDING_ZONE.log(&self.scene_update);
+    pub fn log_static(&self) {
+        LANDING_ZONE_FT.log_static(&self.frame_transform);
+        LANDING_ZONE.log_static(&self.scene_update);
     }
 }

@@ -112,7 +112,7 @@ impl GamepadMsg {
     }
 
     fn roll(&self) -> f32 {
-        self.buttons[Self::BUTTON_L2] - self.buttons[Self::BUTTON_R2]
+        (self.buttons[Self::BUTTON_L2] - self.buttons[Self::BUTTON_R2]) / 2.0
     }
 
     fn rotation(&self) -> Vec3 {

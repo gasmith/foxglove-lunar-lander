@@ -54,9 +54,9 @@ impl Landscape {
         self.height_map.center() - self.height_map.landing_zone() + (Vec3::Z * 200.0)
     }
 
-    pub fn log(&self) {
-        LANDSCAPE_FT.log(&self.frame_transform);
-        LANDSCAPE.log(&self.scene_update);
-        self.landing_zone.log();
+    pub fn log_static(&self) {
+        LANDSCAPE_FT.log_static(&self.frame_transform);
+        LANDSCAPE.log_static(&self.scene_update);
+        self.landing_zone.log_static();
     }
 }

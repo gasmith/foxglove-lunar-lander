@@ -13,8 +13,8 @@ pub struct HeightMap {
 }
 impl HeightMap {
     pub fn new(seed: u32) -> Self {
-        let width = 100;
-        let depth = 100;
+        let width = 200;
+        let depth = 200;
         let noise_scale = 0.1;
         let z_scale = 2.0;
         let perlin = Perlin::new(seed);

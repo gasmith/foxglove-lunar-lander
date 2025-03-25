@@ -7,7 +7,7 @@ edition = "2024"
 anyhow = "1.0.97"
 bytes = "1.10.1"
 evdev = "0.13.0"
-foxglove = "0.4.0"
+foxglove = { path = "../foxglove-sdk/rust/foxglove" }
 glam = "0.30.1"
 noise = "0.9.0"
 parking_lot = "0.12.3"

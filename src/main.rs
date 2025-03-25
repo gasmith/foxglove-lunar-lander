@@ -60,6 +60,7 @@ async fn game_loop(params: Parameters, controls: Controls) {
         let seed = params.next_seed();
         let mut rng = ChaCha8Rng::seed_from_u64(seed);
         let landscape = Landscape::new(&mut rng);
+        landscape.log_static();
         controls.do_reset();
         clear_banner();
         game_round(&landscape, &controls).await;
@@ -68,14 +69,16 @@ async fn game_loop(params: Parameters, controls: Controls) {
 
 async fn game_round(landscape: &Landscape, controls: &Controls) {
     let mut lander = Lander::new(landscape.lander_start_position());
+    let mut status = LanderStatus::Aloft;
     while !controls.is_reset_pending() {
-        match lander.status() {
-            LanderStatus::Aloft => {
-                lander.step(GAME_STEP_DURATION.as_secs_f32(), controls);
+        if matches!(status, LanderStatus::Aloft) {
+            lander.step(GAME_STEP_DURATION.as_secs_f32(), controls);
+            status = lander.status();
+            if !matches!(status, LanderStatus::Aloft) {
+                display_banner(status);
+                lander.stop();
             }
-            status => display_banner(status),
         }
-        landscape.log();
         lander.log();
         tokio::time::sleep(GAME_STEP_DURATION).await;
     }
