@@ -71,7 +71,7 @@ async fn game_round(landscape: &Landscape, controls: &Controls) {
     while !controls.is_reset_pending() {
         landscape.log();
         match lander.status() {
-            LanderStatus::ALOFT => {
+            LanderStatus::Aloft => {
                 lander.step(GAME_STEP_DURATION.as_secs_f32(), controls);
                 lander.log();
             }
@@ -98,33 +98,51 @@ fn clear_banner() {
 
 fn display_banner(status: LanderStatus) {
     let (color, text) = match status {
-        LanderStatus::ALOFT => return,
-        LanderStatus::LANDED => (
+        LanderStatus::Aloft => return,
+        LanderStatus::Landed => (
             Color {
                 r: 0.0,
                 g: 1.0,
                 b: 0.0,
-                a: 0.8,
+                a: 0.75,
             },
             "LANDED".to_string(),
         ),
-        LanderStatus::CRASHED => (
+        LanderStatus::TooFast => (
             Color {
                 r: 1.0,
                 g: 0.0,
                 b: 0.0,
-                a: 0.8,
+                a: 0.75,
             },
-            "YOU DIED".to_string(),
+            "TOO FAST".to_string(),
         ),
-        LanderStatus::MISSED => (
+        LanderStatus::NotLevel => (
+            Color {
+                r: 1.0,
+                g: 0.0,
+                b: 0.0,
+                a: 0.75,
+            },
+            "NOT LEVEL".to_string(),
+        ),
+        LanderStatus::Spinning => (
+            Color {
+                r: 1.0,
+                g: 0.0,
+                b: 0.0,
+                a: 0.75,
+            },
+            "SPINNING".to_string(),
+        ),
+        LanderStatus::Missed => (
             Color {
                 r: 1.0,
                 g: 1.0,
                 b: 0.0,
-                a: 0.8,
+                a: 0.75,
             },
-            "YOU MISSED".to_string(),
+            "MISSED".to_string(),
         ),
     };
     BANNER_FT.log(&FrameTransform {

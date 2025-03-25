@@ -44,6 +44,10 @@ impl Inner {
     }
 
     fn get(&self, names: impl IntoIterator<Item = impl AsRef<str>>) -> Vec<Parameter> {
+        let names: Vec<_> = names.into_iter().collect();
+        if names.is_empty() {
+            return self.get(["seed", "regenerate_seed"]);
+        }
         names
             .into_iter()
             .filter_map(|n| match n.as_ref() {
@@ -68,10 +72,12 @@ impl Inner {
             .filter_map(|n| match (n.name.as_str(), &n.value) {
                 ("seed", Some(ParameterValue::String(v))) if v.len() == 8 => {
                     self.seed = v.as_slice().get_u64_le();
+                    println!("set seed: {}", self.seed);
                     Some(n)
                 }
                 ("regenerate_seed", Some(ParameterValue::Bool(v))) => {
                     self.regenerate_seed = *v;
+                    println!("set regenerate_seed: {}", self.regenerate_seed);
                     Some(n)
                 }
 

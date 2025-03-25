@@ -38,10 +38,12 @@ const APOLLO_LANDER_TORQUE_POWER_N: f32 = 3.0;
 
 #[derive(Debug, Clone, Copy)]
 pub enum LanderStatus {
-    ALOFT,
-    LANDED,
-    CRASHED,
-    MISSED,
+    Aloft,
+    Landed,
+    TooFast,
+    NotLevel,
+    Spinning,
+    Missed,
 }
 
 impl Lander {
@@ -70,8 +72,8 @@ impl Lander {
         let torque = controls.rotation() * self.torque_power;
         self.angular_velocity += torque * dt;
 
-        // Rotational damping
-        self.angular_velocity *= 0.98;
+        // Dampen rotational velocity to make gameplay a bit easier.
+        //self.angular_velocity *= 0.99;
 
         // Update position & orientation.
         self.position += self.velocity * dt;
@@ -85,21 +87,25 @@ impl Lander {
 
     pub fn status(&self) -> LanderStatus {
         if self.position.z > 0.0 {
-            LanderStatus::ALOFT
-        } else if self.vertical_velocity().abs() > 1.0 || self.horizontal_velocity().abs() > 1.0 {
-            LanderStatus::CRASHED
+            LanderStatus::Aloft
+        } else if self.vertical_velocity_mag() > 1.0 || self.horizontal_velocity_mag() > 1.0 {
+            LanderStatus::TooFast
+        } else if self.tilt_radians() > 0.25 {
+            LanderStatus::NotLevel
+        } else if self.angular_velocity.length() > 0.5 {
+            LanderStatus::Spinning
         } else if self.distance_from_center() > LANDING_ZONE_RADIUS as f32 {
-            LanderStatus::MISSED
+            LanderStatus::Missed
         } else {
-            LanderStatus::LANDED
+            LanderStatus::Landed
         }
     }
 
-    fn vertical_velocity(&self) -> f32 {
-        self.velocity.z
+    fn vertical_velocity_mag(&self) -> f32 {
+        self.velocity.z.abs()
     }
 
-    fn horizontal_velocity(&self) -> f32 {
+    fn horizontal_velocity_mag(&self) -> f32 {
         Vec3 {
             x: self.velocity.x,
             y: self.velocity.y,
@@ -115,6 +121,11 @@ impl Lander {
             z: 0.0,
         }
         .length()
+    }
+
+    fn tilt_radians(&self) -> f32 {
+        let up = self.rotation * Vec3::Z;
+        up.angle_between(Vec3::Z)
     }
 
     fn frame_transform(&self) -> FrameTransform {
