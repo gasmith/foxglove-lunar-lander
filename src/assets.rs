@@ -1,18 +1,38 @@
+use std::{collections::HashMap, sync::LazyLock};
+
 use bytes::Bytes;
 use foxglove::websocket::Client;
 
-static APOLLO_LUNAR_MODULE_URDF: &[u8] = include_bytes!("assets/urdf/apollo-lunar-module.urdf");
-static APOLLO_LUNAR_MODULE_STL: &[u8] = include_bytes!("assets/meshes/apollo-lunar-module.stl");
+macro_rules! load_bytes {
+    ($path:literal) => {
+        ($path, include_bytes!($path))
+    };
+}
+
+static ASSETS: &[(&str, &[u8])] = &[
+    load_bytes!("assets/dae/apollo.dae"),
+    load_bytes!("assets/dae/BOOSTER3.png"),
+    load_bytes!("assets/dae/TEXTUREA.png"),
+    load_bytes!("assets/dae/TEXTURE_.png"),
+    load_bytes!("assets/stl/apollo.stl"),
+];
+
+static ASSET_MAP: LazyLock<HashMap<String, Bytes>> = LazyLock::new(|| {
+    ASSETS
+        .iter()
+        .map(|(path, data)| {
+            (
+                path.replace("assets/", "package://").to_string(),
+                Bytes::from_static(data),
+            )
+        })
+        .collect()
+});
 
 pub fn fetch_asset(_client: Client, url: String) -> anyhow::Result<Bytes> {
     println!("fetch asset: {url}");
-    match url.as_str() {
-        "package://meshes/apollo-lunar-module.stl" => {
-            Ok(Bytes::from_static(APOLLO_LUNAR_MODULE_STL))
-        }
-        "package://urdf/apollo-lunar-module.urdf" => {
-            Ok(Bytes::from_static(APOLLO_LUNAR_MODULE_URDF))
-        }
-        _ => Err(anyhow::anyhow!("not found")),
-    }
+    ASSET_MAP.get(&url).cloned().ok_or_else(|| {
+        eprintln!("asset not found: {url}");
+        anyhow::anyhow!("not found")
+    })
 }

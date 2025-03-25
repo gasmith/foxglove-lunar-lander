@@ -51,7 +51,7 @@ impl Landscape {
     }
 
     pub fn lander_start_position(&self) -> Vec3 {
-        self.height_map.center() - self.height_map.landing_zone() + (Vec3::Z * 100.0)
+        self.height_map.center() - self.height_map.landing_zone() + (Vec3::Z * 200.0)
     }
 
     pub fn log(&self) {

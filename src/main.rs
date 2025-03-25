@@ -69,14 +69,14 @@ async fn game_loop(params: Parameters, controls: Controls) {
 async fn game_round(landscape: &Landscape, controls: &Controls) {
     let mut lander = Lander::new(landscape.lander_start_position());
     while !controls.is_reset_pending() {
-        landscape.log();
         match lander.status() {
             LanderStatus::Aloft => {
                 lander.step(GAME_STEP_DURATION.as_secs_f32(), controls);
-                lander.log();
             }
             status => display_banner(status),
         }
+        landscape.log();
+        lander.log();
         tokio::time::sleep(GAME_STEP_DURATION).await;
     }
 }

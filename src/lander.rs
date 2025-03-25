@@ -34,7 +34,7 @@ pub struct Lander {
 // Apollo lunar lander.
 const APOLLO_LANDER_INITIAL_MASS_KG: f32 = 15_200.0;
 const APOLLO_LANDER_THRUST_POWER_N: f32 = 44_500.0;
-const APOLLO_LANDER_TORQUE_POWER_N: f32 = 3.0;
+const APOLLO_LANDER_TORQUE_POWER_N: f32 = 2.0;
 
 #[derive(Debug, Clone, Copy)]
 pub enum LanderStatus {
@@ -73,7 +73,7 @@ impl Lander {
         self.angular_velocity += torque * dt;
 
         // Dampen rotational velocity to make gameplay a bit easier.
-        //self.angular_velocity *= 0.99;
+        self.angular_velocity *= 0.99;
 
         // Update position & orientation.
         self.position += self.velocity * dt;
@@ -142,7 +142,7 @@ impl Lander {
         SceneEntity {
             frame_id: "lander".into(),
             models: vec![ModelPrimitive {
-                url: "package://meshes/apollo-lunar-module.stl".into(),
+                url: "package://dae/apollo.dae".into(),
                 pose: Some(Pose::default()),
                 scale: Some(Vector3 {
                     x: 1.0,
