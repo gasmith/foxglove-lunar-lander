@@ -24,16 +24,7 @@ static_typed_channel!(LANDING_ZONE_FT, "/landing_zone_ft", FrameTransform);
 static_typed_channel!(LANDER, "/lander", SceneUpdate);
 static_typed_channel!(LANDER_FT, "/lander_ft", FrameTransform);
 static_typed_channel!(LANDER_ANGULAR_VELOCITY, "/lander_angular_velocity", Vector3);
-static_typed_channel!(
-    LANDER_HORIZONTAL_VELOCITY,
-    "/lander_horizontal_velocity",
-    Vector3
-);
-static_typed_channel!(
-    LANDER_VERTICAL_VELOCITY,
-    "/lander_vertical_velocity",
-    Vector3
-);
+static_typed_channel!(LANDER_VELOCITY, "/lander_velocity", Vector3);
 static_typed_channel!(LANDER_ORIENTATION, "/lander_orientation", Quaternion);
 
 static APOLLO_LUNAR_MODULE_URDF: &[u8] = include_bytes!("../assets/urdf/apollo-lunar-module.urdf");
@@ -193,15 +184,15 @@ impl GamepadMsg {
     }
 
     fn pitch(&self) -> f32 {
-        self.read_axes(Self::JOY_RY)
+        -self.read_axes(Self::JOY_RY)
     }
 
     fn yaw(&self) -> f32 {
-        self.read_axes(Self::JOY_RX)
+        -self.read_axes(Self::JOY_RX)
     }
 
     fn roll(&self) -> f32 {
-        -self.buttons[Self::BUTTON_L2] + self.buttons[Self::BUTTON_R2]
+        self.buttons[Self::BUTTON_L2] - self.buttons[Self::BUTTON_R2]
     }
 
     fn rotation(&self) -> Vec3 {
@@ -579,16 +570,7 @@ impl Lander {
     fn log(&self) {
         LANDER_FT.log(&self.frame_transform());
         LANDER_ANGULAR_VELOCITY.log(&self.angular_velocity.into_fg());
-        LANDER_HORIZONTAL_VELOCITY.log(&Vector3 {
-            x: self.velocity.x.into(),
-            y: self.velocity.y.into(),
-            z: 0.0,
-        });
-        LANDER_VERTICAL_VELOCITY.log(&Vector3 {
-            x: 0.0,
-            y: 0.0,
-            z: self.velocity.z.into(),
-        });
+        LANDER_VELOCITY.log(&self.velocity.into_fg());
         LANDER_ORIENTATION.log(&self.rotation.into_fg());
         LANDER.log(&SceneUpdate {
             entities: vec![self.scene_entity()],
