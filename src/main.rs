@@ -14,6 +14,7 @@ mod convert;
 mod lander;
 mod landscape;
 mod listener;
+mod message;
 mod parameters;
 
 use controls::Controls;
