@@ -6,7 +6,6 @@ edition = "2024"
 [dependencies]
 anyhow = "1.0.97"
 bytes = "1.10.1"
-clap = { version = "4.5.32", features = ["derive"] }
 evdev = "0.13.0"
 foxglove = "0.4.0"
 glam = "0.30.1"
