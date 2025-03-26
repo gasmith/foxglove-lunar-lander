@@ -58,12 +58,8 @@ const APOLLO_LANDER_INERTIA: Vec3 = Vec3 {
     z: (2.1 * 2.1) / 2.0,
 };
 
-/// Moon gravitational vector in meters/sec/sec.
-const MOON_GRAVITY: Vec3 = Vec3 {
-    x: 0.0,
-    y: 0.0,
-    z: -1.62,
-};
+/// Moon gravitational constant in meters/s^2.
+const MOON_GRAVITY: f32 = -1.62;
 
 #[derive(Debug, Clone, Copy, Serialize, schemars::JsonSchema)]
 #[serde(rename = "snake_case")]
@@ -149,7 +145,7 @@ impl Lander {
 
     pub fn step(&mut self, dt: f32, controls: &Controls) {
         // Gravity.
-        self.velocity += MOON_GRAVITY * dt;
+        self.velocity += MOON_GRAVITY * Vec3::Z * dt;
 
         let total_mass = self.dry_mass + self.payload_mass + self.fuel_mass;
         if self.fuel_mass > 0.0 {
