@@ -1,39 +1,29 @@
 use foxglove::schemas::{Point3, SceneEntity, TriangleListPrimitive};
-use glam::Vec3;
+use glam::{Vec2, Vec3};
 use noise::{NoiseFn, Perlin};
 use rand::prelude::*;
 
-use crate::{LANDING_ZONE_BLEND_RADIUS, LANDING_ZONE_RADIUS};
+const DEFAULT_NOISE_SCALE: f64 = 0.1;
+const DEFAULT_Z_SCALE: f64 = 2.0;
 
+/// A square map of z values.
 pub struct HeightMap {
     width: u32,
-    depth: u32,
-    landing_zone: Vec3,
     z: Vec<f64>,
 }
 impl HeightMap {
-    pub fn new(seed: u32) -> Self {
-        let width = 200;
-        let depth = 200;
-        let noise_scale = 0.1;
-        let z_scale = 2.0;
-        let perlin = Perlin::new(seed);
-        Self {
-            width,
-            depth,
-            landing_zone: Vec3::ZERO,
-            z: (0..width)
-                .flat_map(|x| {
-                    (0..depth).map(move |y| {
-                        z_scale * perlin.get([x as f64 * noise_scale, y as f64 * noise_scale])
-                    })
+    pub fn new<R: Rng>(rng: &mut R, width: u32) -> HeightMap {
+        let z_scale = DEFAULT_Z_SCALE;
+        let noise_scale = DEFAULT_NOISE_SCALE;
+        let perlin = Perlin::new(rng.random());
+        let z = (0..width)
+            .flat_map(|x| {
+                (0..width).map(move |y| {
+                    z_scale * perlin.get([x as f64 * noise_scale, y as f64 * noise_scale])
                 })
-                .collect(),
-        }
-    }
-
-    pub fn landing_zone(&self) -> Vec3 {
-        self.landing_zone
+            })
+            .collect();
+        Self { width, z }
     }
 
     pub fn width(&self) -> u32 {
@@ -41,35 +31,39 @@ impl HeightMap {
     }
 
     pub fn depth(&self) -> u32 {
-        self.depth
+        self.width
     }
 
     pub fn center(&self) -> Vec3 {
-        Vec3 {
-            x: self.width as f32 / 2.0,
-            y: self.depth as f32 / 2.0,
-            z: 0.0,
-        }
+        let x = self.width as f32 / 2.0;
+        Vec3::new(x, x, 0.0)
     }
 
-    fn random_range<R: Rng>(&self, rng: &mut R, margin: u32, max: u32) -> u32 {
-        rng.random_range(margin..max.saturating_sub(margin))
+    fn center2(&self) -> Vec2 {
+        let x = self.width as f32 / 2.0;
+        Vec2::new(x, x)
     }
 
-    pub fn set_random_landing_zone<R: Rng>(&mut self, rng: &mut R) {
-        let x = self.random_range(rng, LANDING_ZONE_BLEND_RADIUS * 2, self.width);
-        let y = self.random_range(rng, LANDING_ZONE_BLEND_RADIUS * 2, self.depth);
-        self.set_landing_zone(x, y);
+    pub fn create_random_landing_zone<R: Rng>(
+        &mut self,
+        rng: &mut R,
+        max_distance: u32,
+        radius: u32,
+    ) -> Vec3 {
+        let angle = rng.random_range(0.0..std::f32::consts::TAU);
+        let len = rng.random_range(0.0..(max_distance as f32));
+        let delta = Vec2::new(angle.cos(), angle.sin()) * len;
+        let vec = delta + self.center2();
+        self.create_landing_zone(vec.x as u32, vec.y as u32, radius)
     }
 
-    fn set_landing_zone(&mut self, center_x: u32, center_y: u32) {
-        let radius = LANDING_ZONE_RADIUS;
-        let blend_radius = LANDING_ZONE_BLEND_RADIUS;
+    fn create_landing_zone(&mut self, center_x: u32, center_y: u32, radius: u32) -> Vec3 {
+        let blend_radius = radius + 3;
         let center_z = self.get(center_x, center_y);
 
         for ix in (center_x - blend_radius)..=(center_x + blend_radius) {
             for iy in (center_y - blend_radius)..=(center_y + blend_radius) {
-                if ix < self.width && iy < self.depth {
+                if ix < self.width && iy < self.width {
                     let dx = ix as f64 - center_x as f64;
                     let dy = iy as f64 - center_y as f64;
                     let dist = (dx * dx + dy * dy).sqrt();
@@ -83,20 +77,20 @@ impl HeightMap {
             }
         }
 
-        self.landing_zone = Vec3 {
+        Vec3 {
             x: center_x as f32,
             y: center_y as f32,
             z: center_z as f32,
-        };
+        }
     }
 
     fn set(&mut self, ix: u32, iy: u32, z: f64) {
-        let idx = (ix * self.depth + iy) as usize;
+        let idx = (ix * self.width + iy) as usize;
         self.z[idx] = z;
     }
 
     fn get(&self, ix: u32, iy: u32) -> f64 {
-        let idx = (ix * self.depth + iy) as usize;
+        let idx = (ix * self.width + iy) as usize;
         self.z[idx]
     }
 
@@ -113,7 +107,7 @@ impl HeightMap {
             frame_id: "landscape".into(),
             triangles: (0..(self.width - 1))
                 .map(|ix| TriangleListPrimitive {
-                    points: (0..(self.depth - 1))
+                    points: (0..(self.width - 1))
                         .flat_map(|iy| {
                             vec![
                                 // Triangle 1

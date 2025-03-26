@@ -26,10 +26,6 @@ use parameters::Parameters;
 static_typed_channel!(BANNER, "/banner", SceneUpdate);
 static_typed_channel!(BANNER_FT, "/banner_ft", FrameTransform);
 
-// make these paramters
-const LANDING_ZONE_RADIUS: u32 = 7;
-const LANDING_ZONE_BLEND_RADIUS: u32 = 10;
-
 const GAME_STEP_DURATION: Duration = Duration::from_millis(33);
 
 #[tokio::main]
@@ -60,16 +56,19 @@ async fn game_loop(params: Parameters, controls: Controls) {
     loop {
         let seed = params.next_seed();
         let mut rng = ChaCha8Rng::seed_from_u64(seed);
-        let landscape = Landscape::new(&mut rng);
+        let landscape = Landscape::new(&mut rng, &params);
+        let lander = Lander::new(
+            landscape.lander_start_position(),
+            params.landing_zone_radius(),
+        );
         landscape.log_static();
         controls.do_reset();
         clear_banner();
-        game_round(&landscape, &controls).await;
+        game_round(lander, &controls).await;
     }
 }
 
-async fn game_round(landscape: &Landscape, controls: &Controls) {
-    let mut lander = Lander::new(landscape.lander_start_position());
+async fn game_round(mut lander: Lander, controls: &Controls) {
     let mut status = LanderStatus::Aloft;
     while !controls.is_reset_pending() {
         if matches!(status, LanderStatus::Aloft) {
@@ -86,12 +85,12 @@ async fn game_round(landscape: &Landscape, controls: &Controls) {
 }
 
 fn clear_banner() {
-    BANNER_FT.log(&FrameTransform {
+    BANNER_FT.log_static(&FrameTransform {
         parent_frame_id: "lander".into(),
         child_frame_id: "banner".into(),
         ..Default::default()
     });
-    BANNER.log(&SceneUpdate {
+    BANNER.log_static(&SceneUpdate {
         deletions: vec![SceneEntityDeletion {
             id: "banner".into(),
             ..Default::default()
@@ -149,7 +148,7 @@ fn display_banner(status: LanderStatus) {
             "MISSED".to_string(),
         ),
     };
-    BANNER_FT.log(&FrameTransform {
+    BANNER_FT.log_static(&FrameTransform {
         parent_frame_id: "lander".into(),
         child_frame_id: "banner".into(),
         translation: Some(Vector3 {
@@ -158,7 +157,7 @@ fn display_banner(status: LanderStatus) {
         }),
         ..Default::default()
     });
-    BANNER.log(&SceneUpdate {
+    BANNER.log_static(&SceneUpdate {
         entities: vec![SceneEntity {
             frame_id: "banner".into(),
             id: "banner".into(),

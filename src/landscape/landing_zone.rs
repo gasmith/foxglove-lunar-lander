@@ -13,12 +13,17 @@ pub struct LandingZone {
     frame_transform: FrameTransform,
     scene_update: SceneUpdate,
 }
+impl From<Vec3> for LandingZone {
+    fn from(value: Vec3) -> Self {
+        LandingZone::new(value)
+    }
+}
 impl LandingZone {
-    pub fn new(landing_zone: Vec3) -> Self {
+    pub fn new(center: Vec3) -> Self {
         let frame_transform = FrameTransform {
             parent_frame_id: "landscape".into(),
             child_frame_id: "landing_zone".into(),
-            translation: Some(landing_zone.into_fg()),
+            translation: Some(center.into_fg()),
             ..Default::default()
         };
         let scene_update = SceneUpdate {

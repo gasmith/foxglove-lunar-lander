@@ -4,7 +4,6 @@ use foxglove::schemas::{
 use foxglove::static_typed_channel;
 use glam::{EulerRot, Quat, Vec3};
 
-use crate::LANDING_ZONE_RADIUS;
 use crate::controls::Controls;
 use crate::convert::IntoFg;
 use crate::message::Metric;
@@ -71,10 +70,11 @@ pub struct Lander {
     fuel_mass: f32,
     thrust_power: f32,
     torque_power: f32,
+    landing_zone_radius: u32,
 }
 
 impl Lander {
-    pub fn new(position: Vec3) -> Self {
+    pub fn new(position: Vec3, landing_zone_radius: u32) -> Self {
         Self {
             position,
             velocity: Vec3::ZERO,
@@ -85,6 +85,7 @@ impl Lander {
             fuel_mass: APOLLO_LANDER_INITIAL_FUEL_MASS_KG,
             thrust_power: APOLLO_LANDER_THRUST_N,
             torque_power: APOLLO_LANDER_TORQUE_NM,
+            landing_zone_radius,
         }
     }
 
@@ -136,7 +137,7 @@ impl Lander {
             LanderStatus::NotLevel
         } else if self.angular_velocity.length() > 0.5 {
             LanderStatus::Spinning
-        } else if self.distance_from_center() > LANDING_ZONE_RADIUS as f32 {
+        } else if self.distance_from_center() > self.landing_zone_radius as f32 {
             LanderStatus::Missed
         } else {
             LanderStatus::Landed
