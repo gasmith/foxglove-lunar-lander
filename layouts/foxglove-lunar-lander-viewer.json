@@ -221,18 +221,6 @@
       "imageMode": {},
       "foxglovePanelTitle": "Landing zone"
     },
-    "Joystick Panel.Joystick!3xdth4t": {
-      "subJoyTopic": "/joy",
-      "pubJoyTopic": "/joy",
-      "publishMode": true,
-      "publishFrameId": "",
-      "dataSource": "gamepad",
-      "displayMode": "custom",
-      "debugGamepad": false,
-      "layoutName": "xbox",
-      "mapping_name": "TODO",
-      "gamepadId": 0
-    },
     "Plot!1uw7vkz": {
       "paths": [
         {
@@ -312,9 +300,6 @@
       "foxglovePanelTitle": "Velocity",
       "yAxisLabel": "meters/s"
     },
-    "Parameters!2jpo33q": {
-      "title": "Parameters"
-    },
     "Tab!2axo8zo": {
       "activeTabIdx": 0,
       "tabs": [
@@ -340,14 +325,9 @@
               },
               "second": {
                 "first": {
-                  "first": "Joystick Panel.Joystick!3xdth4t",
-                  "second": {
-                    "first": "Plot!1uw7vkz",
-                    "second": "Plot!1vt8ayk",
-                    "direction": "column"
-                  },
-                  "direction": "column",
-                  "splitPercentage": 5.985915492957747
+                  "first": "Plot!1uw7vkz",
+                  "second": "Plot!1vt8ayk",
+                  "direction": "column"
                 },
                 "second": "Plot!2cbt9r8",
                 "direction": "column",
@@ -359,10 +339,6 @@
             "direction": "row",
             "splitPercentage": 19.36114732724902
           }
-        },
-        {
-          "title": "Config",
-          "layout": "Parameters!2jpo33q"
         }
       ]
     }
