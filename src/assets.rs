@@ -10,19 +10,20 @@ macro_rules! load_bytes {
 }
 
 static ASSETS: &[(&str, &[u8])] = &[
-    load_bytes!("assets/dae/apollo.dae"),
-    load_bytes!("assets/dae/BOOSTER3.png"),
-    load_bytes!("assets/dae/TEXTUREA.png"),
-    load_bytes!("assets/dae/TEXTURE_.png"),
-    load_bytes!("assets/stl/apollo.stl"),
+    load_bytes!("../assets/apollo.dae"),
+    load_bytes!("../assets/apollo.stl"),
+    load_bytes!("../assets/BOOSTER3.png"),
+    load_bytes!("../assets/TEXTUREA.png"),
+    load_bytes!("../assets/TEXTURE_.png"),
 ];
 
 static ASSET_MAP: LazyLock<HashMap<String, Bytes>> = LazyLock::new(|| {
+    let uri_prefix = format!("package://{}", env!("CARGO_PKG_NAME"));
     ASSETS
         .iter()
         .map(|(path, data)| {
             (
-                path.replace("assets/", "package://").to_string(),
+                path.replace("..", &uri_prefix).to_string(),
                 Bytes::from_static(data),
             )
         })

@@ -295,7 +295,7 @@ impl Lander {
         SceneEntity {
             frame_id: "lander".into(),
             models: vec![ModelPrimitive {
-                url: "package://dae/apollo.dae".into(),
+                url: "package://foxglove-lunar-lander/assets/apollo.dae".into(),
                 pose: Some(Pose::default()),
                 scale: Some(Vector3 {
                     x: 1.0,
@@ -337,10 +337,9 @@ impl Lander {
         LANDING_REPORT.log_static(&LandingReport::default());
     }
 
-    pub fn log_landing_report(&self) {
-        let Some(report) = self.landing_report() else {
-            return;
-        };
+    pub fn log_landing_report(&self) -> Option<LandingStatus> {
+        let report = self.landing_report()?;
+        let status = report.status;
         let ((r, g, b), text) = match report.status {
             LandingStatus::Landed => ((0.0, 1.0, 0.0), "LANDED"),
             LandingStatus::Missed => ((1.0, 1.0, 0.0), "MISSED"),
@@ -374,5 +373,6 @@ impl Lander {
         LANDING_REPORT.log_static(&LandingReport {
             report: Some(report),
         });
+        Some(status)
     }
 }

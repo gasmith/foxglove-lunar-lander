@@ -1,0 +1,376 @@
+{
+  "configById": {
+    "RawMessages!qwwh8a": {
+      "diffEnabled": false,
+      "diffMethod": "custom",
+      "diffTopicPath": "",
+      "showFullMessageForDiff": false,
+      "topicPath": "/landing_report.report",
+      "fontSize": 12
+    },
+    "Plot!1odyly4": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/lander_angular_velocity.x",
+          "enabled": true,
+          "color": "#4e98e2",
+          "label": "pitch",
+          "showLine": true
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/lander_angular_velocity.y",
+          "enabled": true,
+          "color": "#f5774d",
+          "label": "roll"
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/lander_angular_velocity.z",
+          "enabled": true,
+          "color": "#f7df71",
+          "label": "yaw"
+        }
+      ],
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": false,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "foxglovePanelTitle": "Angular velocity",
+      "yAxisLabel": "radian/s"
+    },
+    "foxglove-navball.Navball!270y3x5": {
+      "topic": "/lander_orientation",
+      "course_topic": "/lander_course"
+    },
+    "3D!2un5fuq": {
+      "cameraState": {
+        "perspective": true,
+        "distance": 19.99999999999999,
+        "phi": 36.29999999999998,
+        "thetaOffset": 0.9278350515463915,
+        "targetOffset": [
+          0.03918484545054792,
+          -0.09393185982035646,
+          0
+        ],
+        "target": [
+          0,
+          0,
+          0
+        ],
+        "targetOrientation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "fovy": 45,
+        "near": 0.5,
+        "far": 5000
+      },
+      "followMode": "follow-pose",
+      "followTf": "lander",
+      "scene": {
+        "enableStats": false
+      },
+      "transforms": {
+        "frame:world": {
+          "visible": false
+        },
+        "frame:landscape": {
+          "visible": false
+        }
+      },
+      "topics": {
+        "/lander": {
+          "visible": true,
+          "showOutlines": false
+        },
+        "/landing_zone": {
+          "visible": true
+        },
+        "/landscape": {
+          "visible": true
+        },
+        "/banner": {
+          "visible": true
+        }
+      },
+      "layers": {
+        "grid": {
+          "visible": false,
+          "frameLocked": true,
+          "label": "Grid",
+          "instanceId": "3e7e760e-130b-48bb-80b6-c2d1cab9cc57",
+          "layerId": "foxglove.Grid",
+          "size": 10,
+          "divisions": 10,
+          "lineWidth": 1,
+          "color": "#248eff",
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "publish": {
+        "type": "point",
+        "poseTopic": "/move_base_simple/goal",
+        "pointTopic": "/clicked_point",
+        "poseEstimateTopic": "/initialpose",
+        "poseEstimateXDeviation": 0.5,
+        "poseEstimateYDeviation": 0.5,
+        "poseEstimateThetaDeviation": 0.26179939
+      },
+      "imageMode": {}
+    },
+    "3D!4gxmqi7": {
+      "cameraState": {
+        "perspective": false,
+        "distance": 79.89004262316497,
+        "phi": 76.90391335133191,
+        "thetaOffset": 90,
+        "targetOffset": [
+          0.3530468152696965,
+          -14.91597929044879,
+          1.5175978395708938
+        ],
+        "target": [
+          0,
+          0,
+          0
+        ],
+        "targetOrientation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "fovy": 45,
+        "near": 0.5,
+        "far": 5000
+      },
+      "followMode": "follow-pose",
+      "followTf": "landing_zone",
+      "scene": {
+        "syncCamera": false,
+        "labelScaleFactor": 1,
+        "enableStats": false
+      },
+      "transforms": {
+        "frame:landscape": {
+          "visible": false
+        }
+      },
+      "topics": {
+        "/landscape": {
+          "visible": true
+        },
+        "/lander": {
+          "visible": true,
+          "showOutlines": false
+        },
+        "/landing_zone": {
+          "visible": true
+        }
+      },
+      "layers": {
+        "grid": {
+          "visible": false,
+          "frameLocked": true,
+          "label": "Grid",
+          "instanceId": "e229fe94-0315-441a-9269-e7b8be6fe8c9",
+          "layerId": "foxglove.Grid",
+          "size": 10,
+          "divisions": 10,
+          "lineWidth": 1,
+          "color": "#248eff",
+          "position": [
+            0,
+            0,
+            0
+          ],
+          "rotation": [
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "publish": {
+        "type": "point",
+        "poseTopic": "/move_base_simple/goal",
+        "pointTopic": "/clicked_point",
+        "poseEstimateTopic": "/initialpose",
+        "poseEstimateXDeviation": 0.5,
+        "poseEstimateYDeviation": 0.5,
+        "poseEstimateThetaDeviation": 0.26179939
+      },
+      "imageMode": {},
+      "foxglovePanelTitle": "Landing zone"
+    },
+    "Joystick Panel.Joystick!3xdth4t": {
+      "subJoyTopic": "/joy",
+      "pubJoyTopic": "/joy",
+      "publishMode": true,
+      "publishFrameId": "",
+      "dataSource": "gamepad",
+      "displayMode": "custom",
+      "debugGamepad": false,
+      "layoutName": "xbox",
+      "mapping_name": "TODO",
+      "gamepadId": 0
+    },
+    "Plot!1uw7vkz": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/lander_fuel_mass.value",
+          "enabled": true,
+          "color": "#da4fe3",
+          "label": "fuel"
+        }
+      ],
+      "minYValue": 0,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": false,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "yAxisLabel": "kilograms"
+    },
+    "Plot!1vt8ayk": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/lander_ft.translation.z",
+          "enabled": true,
+          "color": "#f7df71",
+          "label": "z",
+          "showLine": true
+        }
+      ],
+      "minYValue": 0,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": false,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "foxglovePanelTitle": "Altitude",
+      "yAxisLabel": "meters"
+    },
+    "Plot!2cbt9r8": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/lander_velocity.x",
+          "enabled": true,
+          "color": "#4e98e2",
+          "label": "x"
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/lander_velocity.y",
+          "enabled": true,
+          "color": "#f5774d",
+          "label": "y"
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/lander_velocity.z",
+          "enabled": true,
+          "color": "#f7df71",
+          "label": "z"
+        }
+      ],
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": false,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "foxglovePanelTitle": "Velocity",
+      "yAxisLabel": "meters/s"
+    },
+    "Parameters!2jpo33q": {
+      "title": "Parameters"
+    },
+    "Tab!2axo8zo": {
+      "activeTabIdx": 0,
+      "tabs": [
+        {
+          "title": "HUD",
+          "layout": {
+            "first": {
+              "first": {
+                "first": "RawMessages!qwwh8a",
+                "second": "Plot!1odyly4",
+                "direction": "column",
+                "splitPercentage": 48.561151079136685
+              },
+              "second": "foxglove-navball.Navball!270y3x5",
+              "direction": "column",
+              "splitPercentage": 62.336114421930866
+            },
+            "second": {
+              "first": {
+                "first": "3D!2un5fuq",
+                "second": "3D!4gxmqi7",
+                "direction": "column"
+              },
+              "second": {
+                "first": {
+                  "first": "Joystick Panel.Joystick!3xdth4t",
+                  "second": {
+                    "first": "Plot!1uw7vkz",
+                    "second": "Plot!1vt8ayk",
+                    "direction": "column"
+                  },
+                  "direction": "column",
+                  "splitPercentage": 5.985915492957747
+                },
+                "second": "Plot!2cbt9r8",
+                "direction": "column",
+                "splitPercentage": 62.81287246722288
+              },
+              "direction": "row",
+              "splitPercentage": 69.19967663702508
+            },
+            "direction": "row",
+            "splitPercentage": 19.36114732724902
+          }
+        },
+        {
+          "title": "Config",
+          "layout": "Parameters!2jpo33q"
+        }
+      ]
+    }
+  },
+  "globalVariables": {},
+  "userNodes": {},
+  "playbackConfig": {
+    "speed": 1
+  },
+  "layout": "Tab!2axo8zo"
+}

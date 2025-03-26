@@ -1,13 +1,14 @@
 [package]
-name = "fg-sdk-hackathon"
+name = "foxglove-lunar-lander"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
 anyhow = "1.0.97"
 bytes = "1.10.1"
+chrono = "0.4.40"
 evdev = "0.13.0"
-foxglove = { path = "../foxglove-sdk/rust/foxglove" }
+foxglove = { path = "./foxglove-sdk/rust/foxglove" }
 glam = "0.30.1"
 noise = "0.9.0"
 parking_lot = "0.12.3"
@@ -16,4 +17,5 @@ rand_chacha = "0.9.0"
 schemars = "0.8.22"
 serde = { version = "1.0.219", features = ["derive"] }
 serde_json = "1.0.140"
+tempfile = "3.19.1"
 tokio = { version = "1.44.1", features = ["macros", "rt-multi-thread", "signal", "time"] }
