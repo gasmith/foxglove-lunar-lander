@@ -37,17 +37,26 @@ const APOLLO_LANDER_INITIAL_FUEL_MASS_KG: f32 = 600.0;
 /// Main descent thrust power in newtons.
 const APOLLO_LANDER_THRUST_N: f32 = 45_000.0;
 
-/// RCS thrust power in newton-meters.
-///
-/// This number is a lie. The actual module had sixteen 440N thrusters, arranged in four quads,
-/// with multiple thrusters being used to apply torque to adjust attitude. Assuming the RCS
-/// thrusters are ~2m from the center of mass, they should be capable of exerting several kN-m of
-/// torque, but that makes the simulator utterly unusable. So we cap the torque to a value several
-/// orders of magnitude smaller.
-const APOLLO_LANDER_TORQUE_NM: f32 = 2.0;
-
 /// Descent fuel burn rate at full thrust, in kg/s.
 const APOLLO_LANDER_FUEL_BURN_RATE_KGPS: f32 = 15.0;
+
+/// RCS thrust power in newton-meters.
+///
+/// The module had sixteen 440N thrusters arranged in quads, and we're estimating that they're
+/// about 2m from the center of mass.
+const APOLLO_LANDER_TORQUE_NM: f32 = 3700.0;
+
+/// Estimated inertial profile for the lunar lander.
+///
+/// The lander is roughly round in the horizontal plane with a diameter of 4.2m, and it's 7m
+/// tall with both ascent & descent stages.
+///
+/// If we model it as a cylinder, the moments of inertia are:
+const APOLLO_LANDER_INERTIA: Vec3 = Vec3 {
+    x: (3.0 * 2.1 * 2.1 + 7.0 * 7.0) / 12.0,
+    y: (3.0 * 2.1 * 2.1 + 7.0 * 7.0) / 12.0,
+    z: (2.1 * 2.1) / 2.0,
+};
 
 /// Moon gravitational vector in meters/sec/sec.
 const MOON_GRAVITY: Vec3 = Vec3 {
@@ -86,12 +95,13 @@ impl LandingCriterion {
     }
 
     fn score(&self) -> f32 {
-        (self.max - self.actual).max(0.0) / self.max
+        (self.max - self.actual) / self.max
     }
 }
 
 #[derive(Debug, Default, Clone, Serialize, schemars::JsonSchema)]
 pub struct LandingReport {
+    #[serde(skip_serializing_if = "Option::is_none")]
     report: Option<LandingReportInner>,
 }
 
@@ -141,12 +151,12 @@ impl Lander {
         // Gravity.
         self.velocity += MOON_GRAVITY * dt;
 
+        let total_mass = self.dry_mass + self.payload_mass + self.fuel_mass;
         if self.fuel_mass > 0.0 {
             // Apply thrust.
             let thrust = controls.thrust();
             let thrust_dir = self.rotation * Vec3::Z;
             let thrust_force = thrust_dir * thrust * self.thrust_power;
-            let total_mass = self.dry_mass + self.payload_mass + self.fuel_mass;
             self.velocity += (thrust_force / total_mass) * dt;
 
             // Consume fuel.
@@ -156,10 +166,11 @@ impl Lander {
 
         // Apply torque.
         let torque = controls.rotation() * self.torque_power;
-        self.angular_velocity += torque * dt;
+        let inertia = total_mass * APOLLO_LANDER_INERTIA;
+        self.angular_velocity += (torque / inertia) * dt;
 
         // Dampen rotational velocity to make gameplay a bit easier.
-        self.angular_velocity *= 0.99;
+        self.angular_velocity *= 0.999;
 
         // Update position & orientation.
         self.position += self.velocity * dt;
@@ -231,7 +242,7 @@ impl Lander {
             };
         }
         vec![
-            criterion!(VerticalSpeed, 1.0, self.vertical_speed()),
+            criterion!(VerticalSpeed, 3.0, self.vertical_speed()),
             criterion!(HorizontalSpeed, 1.0, self.horizontal_speed()),
             criterion!(Tilt, 0.25, self.tilt()),
             criterion!(AngularSpeed, 0.25, self.angular_speed()),
