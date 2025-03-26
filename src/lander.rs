@@ -16,6 +16,7 @@ static_typed_channel!(LANDER_ANGULAR_VELOCITY, "/lander_angular_velocity", Vecto
 static_typed_channel!(LANDER_VELOCITY, "/lander_velocity", Vector3);
 static_typed_channel!(LANDER_ORIENTATION, "/lander_orientation", Quaternion);
 static_typed_channel!(LANDER_FUEL_MASS, "/lander_fuel_mass", Metric);
+static_typed_channel!(LANDER_COURSE, "/lander_course", Vector3);
 static_typed_channel!(LANDING_REPORT, "/landing_report", LandingReport);
 static_typed_channel!(BANNER, "/banner", SceneUpdate);
 static_typed_channel!(BANNER_FT, "/banner_ft", FrameTransform);
@@ -306,6 +307,7 @@ impl Lander {
         LANDER_FUEL_MASS.log(&self.fuel_mass.into_fg());
         LANDER_ORIENTATION.log(&self.rotation.into_fg());
         LANDER_VELOCITY.log(&self.velocity.into_fg());
+        LANDER_COURSE.log(&(-self.position).into_fg());
         LANDER.log(&SceneUpdate {
             entities: vec![self.scene_entity()],
             ..Default::default()
