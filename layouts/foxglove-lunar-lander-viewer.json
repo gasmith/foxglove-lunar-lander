@@ -12,6 +12,50 @@
       "paths": [
         {
           "timestampMethod": "receiveTime",
+          "value": "/lander_orientation.x",
+          "enabled": true,
+          "color": "#4e98e2",
+          "label": "x",
+          "showLine": true
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/lander_orientation.y",
+          "enabled": true,
+          "color": "#f5774d",
+          "label": "y"
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/lander_orientation.z",
+          "enabled": false,
+          "color": "#f7df71",
+          "label": "z",
+          "showLine": true
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/lander_orientation.w",
+          "enabled": false,
+          "color": "#5cd6a9",
+          "label": "w"
+        }
+      ],
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": false,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "foxglovePanelTitle": "Orientation",
+      "yAxisLabel": ""
+    },
+    "Plot!3uqwgqq": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
           "value": "/lander_angular_velocity.x",
           "enabled": true,
           "color": "#4e98e2",
@@ -331,13 +375,17 @@
             "first": {
               "first": {
                 "first": "RawMessages!qwwh8a",
-                "second": "Plot!1odyly4",
+                "second": {
+                  "first": "Plot!1odyly4",
+                  "second": "Plot!3uqwgqq",
+                  "direction": "column"
+                },
                 "direction": "column",
-                "splitPercentage": 48.561151079136685
+                "splitPercentage": 29.254302103250478
               },
               "second": "foxglove-navball.Navball!270y3x5",
               "direction": "column",
-              "splitPercentage": 62.336114421930866
+              "splitPercentage": 68.89153754469606
             },
             "second": {
               "first": {
