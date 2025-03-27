@@ -14,30 +14,39 @@ impl Controls {
         self.0.read().rotate
     }
 
-    pub fn rate_of_descent(&self) -> f32 {
-        self.0.read().rate_of_descent
+    pub fn get_and_reset_vertical_velocity_delta(&self) -> f32 {
+        let mut inner = self.0.write();
+        0.1 * (inner.inc_vertical_velocity.get_and_reset() as f32
+            - inner.dec_vertical_velocity.get_and_reset() as f32)
     }
 
     pub fn is_reset_pending(&self) -> bool {
         self.0.read().reset
     }
 
-    pub fn request_reset(&self) {
-        self.0.write().reset = true;
-    }
-
     pub fn do_reset(&self) {
         let mut inner = self.0.write();
         inner.reset = false;
-        inner.rate_of_descent = 0.0;
+        inner.strafe = Vec2::ZERO;
         inner.rotate = Vec3::ZERO;
+        inner.inc_vertical_velocity.reset();
+        inner.dec_vertical_velocity.reset();
     }
 
-    pub fn update(&self, strafe: Vec2, rotate: Vec3, delta_rate_of_descent: f32) {
+    pub fn update(
+        &self,
+        strafe: Vec2,
+        rotate: Vec3,
+        inc_vertical_velocity: bool,
+        dec_vertical_velocity: bool,
+        request_reset: bool,
+    ) {
         let mut inner = self.0.write();
         inner.strafe = strafe;
         inner.rotate = rotate;
-        inner.rate_of_descent += delta_rate_of_descent;
+        inner.inc_vertical_velocity.update(inc_vertical_velocity);
+        inner.dec_vertical_velocity.update(dec_vertical_velocity);
+        inner.reset |= request_reset;
     }
 }
 
@@ -46,5 +55,38 @@ struct Inner {
     reset: bool,
     strafe: Vec2,
     rotate: Vec3,
-    rate_of_descent: f32,
+    inc_vertical_velocity: TapCounter,
+    dec_vertical_velocity: TapCounter,
+}
+
+#[derive(Default)]
+struct TapCounter {
+    latch: bool,
+    count: u32,
+}
+
+impl TapCounter {
+    fn update(&mut self, pressed: bool) {
+        match (pressed, self.latch) {
+            (true, false) => {
+                self.latch = true;
+                self.count += 1;
+            }
+            (false, true) => {
+                self.latch = false;
+            }
+            _ => (),
+        }
+    }
+
+    fn get_and_reset(&mut self) -> u32 {
+        let value = self.count;
+        self.count = 0;
+        value
+    }
+
+    fn reset(&mut self) {
+        self.count = 0;
+        self.latch = false;
+    }
 }

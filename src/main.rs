@@ -74,7 +74,9 @@ async fn game_iter(
     let mut rng = ChaCha8Rng::seed_from_u64(seed);
     let landscape = Landscape::new(&mut rng, params);
     let mut lander = Lander::new(
-        landscape.lander_start_position(),
+        landscape.lander_init_position(),
+        params.lander_init_vertical_velocity(),
+        params.lander_init_vertical_velocity_target(),
         params.landing_zone_radius(),
     );
 

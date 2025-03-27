@@ -12,12 +12,6 @@ use landing_zone::LandingZone;
 
 use crate::parameters::Parameters;
 
-pub const DEFAULT_LANDSCAPE_WIDTH: u32 = 200;
-pub const DEFAULT_LANDING_ZONE_MIN_DISTANCE: u32 = 30;
-pub const DEFAULT_LANDING_ZONE_MAX_DISTANCE: u32 = 70;
-pub const DEFAULT_LANDING_ZONE_RADIUS: u32 = 20;
-pub const DEFAULT_LANDER_START_ALTITUDE: u32 = 200;
-
 static_typed_channel!(LANDSCAPE, "/landscape", SceneUpdate);
 static_typed_channel!(LANDSCAPE_FT, "/landscape_ft", FrameTransform);
 
@@ -25,7 +19,7 @@ pub struct Landscape {
     frame_transform: FrameTransform,
     scene_update: SceneUpdate,
     landing_zone: LandingZone,
-    lander_start_position: Vec3,
+    lander_init_position: Vec3,
 }
 impl Landscape {
     pub fn new<R: Rng>(rng: &mut R, params: &Parameters) -> Self {
@@ -36,8 +30,8 @@ impl Landscape {
             params.landing_zone_max_distance(),
             params.landing_zone_radius(),
         );
-        let lander_start_position = height_map.center() - landing_zone_center
-            + (Vec3::Z * params.lander_start_altitude() as f32);
+        let lander_init_position =
+            height_map.center() - landing_zone_center + (Vec3::Z * params.lander_init_altitude());
         let frame_transform = FrameTransform {
             parent_frame_id: "world".into(),
             child_frame_id: "landscape".into(),
@@ -56,12 +50,12 @@ impl Landscape {
             frame_transform,
             scene_update,
             landing_zone: landing_zone_center.into(),
-            lander_start_position,
+            lander_init_position,
         }
     }
 
-    pub fn lander_start_position(&self) -> Vec3 {
-        self.lander_start_position
+    pub fn lander_init_position(&self) -> Vec3 {
+        self.lander_init_position
     }
 
     pub fn log_static(&self) {

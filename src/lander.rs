@@ -11,7 +11,7 @@ use crate::convert::IntoFg;
 use crate::message::Metric;
 
 mod controllers;
-use controllers::RodController;
+use controllers::VerticalVelocityController;
 
 static_typed_channel!(BANNER, "/banner", SceneUpdate);
 static_typed_channel!(BANNER_FT, "/banner_ft", FrameTransform);
@@ -21,8 +21,12 @@ static_typed_channel!(LANDER_COURSE, "/lander_course", Vector3);
 static_typed_channel!(LANDER_FT, "/lander_ft", FrameTransform);
 static_typed_channel!(LANDER_FUEL_MASS, "/lander_fuel_mass", Metric);
 static_typed_channel!(LANDER_ORIENTATION, "/lander_orientation", Quaternion);
-static_typed_channel!(LANDER_ROD_TARGET, "/lander_rod_target", Metric);
 static_typed_channel!(LANDER_VELOCITY, "/lander_velocity", Vector3);
+static_typed_channel!(
+    LANDER_VERTICAL_VELOCITY_TARGET,
+    "/lander_vertical_velocity_target",
+    Metric
+);
 static_typed_channel!(LANDING_REPORT, "/landing_report", LandingReport);
 
 /// Base mass for the apollo lander.
@@ -131,14 +135,19 @@ pub struct Lander {
     rcs_thrust: f32,
     rcs_torque: f32,
     landing_zone_radius: u32,
-    rod: RodController,
+    vertical_velocity_controller: VerticalVelocityController,
 }
 
 impl Lander {
-    pub fn new(position: Vec3, landing_zone_radius: u32) -> Self {
+    pub fn new(
+        position: Vec3,
+        vertical_velocity: f32,
+        vertical_velocity_target: f32,
+        landing_zone_radius: u32,
+    ) -> Self {
         Self {
             position,
-            velocity: Vec3::ZERO,
+            velocity: Vec3::Z * vertical_velocity,
             rotation: Quat::IDENTITY,
             angular_velocity: Vec3::ZERO,
             dry_mass: APOLLO_LANDER_DRY_MASS_KG,
@@ -148,7 +157,10 @@ impl Lander {
             rcs_thrust: APOLLO_LANDER_RCS_THRUST_N,
             rcs_torque: APOLLO_LANDER_RCS_TORQUE_NM,
             landing_zone_radius,
-            rod: RodController::new(0.0, APOLLO_LANDER_DCS_THRUST_N),
+            vertical_velocity_controller: VerticalVelocityController::new(
+                vertical_velocity_target,
+                APOLLO_LANDER_DCS_THRUST_N,
+            ),
         }
     }
 
@@ -158,15 +170,19 @@ impl Lander {
     }
 
     pub fn step(&mut self, dt: f32, controls: &Controls) {
-        // Update target rate of descent.
-        self.rod.set_target(controls.rate_of_descent());
+        // Update target vertical velocity.
+        self.vertical_velocity_controller
+            .adjust_target(controls.get_and_reset_vertical_velocity_delta());
 
         let total_mass = self.dry_mass + self.payload_mass + self.fuel_mass;
         if self.fuel_mass > 0.0 {
             // Use rate-of-descent PID controller to compute throttle.
-            let throttle = self
-                .rod
-                .compute_throttle(self.velocity.z, total_mass, self.tilt(), dt);
+            let throttle = self.vertical_velocity_controller.compute_throttle(
+                self.velocity.z,
+                total_mass,
+                self.tilt(),
+                dt,
+            );
 
             // Apply throttle.
             let thrust_dir = self.rotation * Vec3::Z;
@@ -336,16 +352,16 @@ impl Lander {
 
     pub fn log(&self) {
         LANDER_FT.log(&self.frame_transform());
-        LANDER_ANGULAR_VELOCITY.log(&self.angular_velocity.into_fg());
-        LANDER_FUEL_MASS.log(&self.fuel_mass.into_fg());
-        LANDER_ORIENTATION.log(&self.rotation.into_fg());
-        LANDER_ROD_TARGET.log(&self.rod.target().into_fg());
-        LANDER_VELOCITY.log(&self.velocity.into_fg());
-        LANDER_COURSE.log(&(-self.position).into_fg());
         LANDER.log(&SceneUpdate {
             entities: vec![self.scene_entity()],
             ..Default::default()
         });
+        LANDER_ANGULAR_VELOCITY.log(&self.angular_velocity.into_fg());
+        LANDER_COURSE.log(&(-self.position).into_fg());
+        LANDER_FUEL_MASS.log(&self.fuel_mass.into_fg());
+        LANDER_ORIENTATION.log(&self.rotation.into_fg());
+        LANDER_VELOCITY.log(&self.velocity.into_fg());
+        LANDER_VERTICAL_VELOCITY_TARGET.log(&self.vertical_velocity_controller.target().into_fg());
     }
 
     pub fn clear_landing_report(&self) {

@@ -314,7 +314,7 @@
       "paths": [
         {
           "timestampMethod": "receiveTime",
-          "value": "/lander_rod_target.value",
+          "value": "/lander_vertical_velocity_target.value",
           "enabled": true,
           "color": "#4e98e2",
           "label": "target"

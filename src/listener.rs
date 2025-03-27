@@ -32,11 +32,13 @@ impl ServerListener for Listener {
                 return;
             }
         };
-        self.controls
-            .update(msg.strafe(), msg.rotate(), msg.delta_rate_of_descent());
-        if msg.reset() {
-            self.controls.request_reset();
-        }
+        self.controls.update(
+            msg.strafe(),
+            msg.rotate(),
+            msg.inc_vertical_velocity(),
+            msg.dec_vertical_velocity(),
+            msg.reset(),
+        );
     }
 
     fn on_get_parameters(
@@ -125,7 +127,11 @@ impl GamepadMsg {
         }
     }
 
-    fn delta_rate_of_descent(&self) -> f32 {
-        (self.buttons[Self::BUTTON_UP] - self.buttons[Self::BUTTON_DOWN]) * 0.1
+    fn inc_vertical_velocity(&self) -> bool {
+        self.buttons[Self::BUTTON_UP] > 0.0
+    }
+
+    fn dec_vertical_velocity(&self) -> bool {
+        self.buttons[Self::BUTTON_DOWN] > 0.0
     }
 }
