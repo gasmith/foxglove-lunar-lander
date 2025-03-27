@@ -10,16 +10,20 @@ use crate::controls::Controls;
 use crate::convert::IntoFg;
 use crate::message::Metric;
 
-static_typed_channel!(LANDER, "/lander", SceneUpdate);
-static_typed_channel!(LANDER_FT, "/lander_ft", FrameTransform);
-static_typed_channel!(LANDER_ANGULAR_VELOCITY, "/lander_angular_velocity", Vector3);
-static_typed_channel!(LANDER_VELOCITY, "/lander_velocity", Vector3);
-static_typed_channel!(LANDER_ORIENTATION, "/lander_orientation", Quaternion);
-static_typed_channel!(LANDER_FUEL_MASS, "/lander_fuel_mass", Metric);
-static_typed_channel!(LANDER_COURSE, "/lander_course", Vector3);
-static_typed_channel!(LANDING_REPORT, "/landing_report", LandingReport);
+mod controllers;
+use controllers::RodController;
+
 static_typed_channel!(BANNER, "/banner", SceneUpdate);
 static_typed_channel!(BANNER_FT, "/banner_ft", FrameTransform);
+static_typed_channel!(LANDER, "/lander", SceneUpdate);
+static_typed_channel!(LANDER_ANGULAR_VELOCITY, "/lander_angular_velocity", Vector3);
+static_typed_channel!(LANDER_COURSE, "/lander_course", Vector3);
+static_typed_channel!(LANDER_FT, "/lander_ft", FrameTransform);
+static_typed_channel!(LANDER_FUEL_MASS, "/lander_fuel_mass", Metric);
+static_typed_channel!(LANDER_ORIENTATION, "/lander_orientation", Quaternion);
+static_typed_channel!(LANDER_ROD_TARGET, "/lander_rod_target", Metric);
+static_typed_channel!(LANDER_VELOCITY, "/lander_velocity", Vector3);
+static_typed_channel!(LANDING_REPORT, "/landing_report", LandingReport);
 
 /// Base mass for the apollo lander.
 const APOLLO_LANDER_DRY_MASS_KG: f32 = 2_150.0;
@@ -120,6 +124,7 @@ pub struct Lander {
     thrust_power: f32,
     torque_power: f32,
     landing_zone_radius: u32,
+    rod: RodController,
 }
 
 impl Lander {
@@ -135,6 +140,7 @@ impl Lander {
             thrust_power: APOLLO_LANDER_THRUST_N,
             torque_power: APOLLO_LANDER_TORQUE_NM,
             landing_zone_radius,
+            rod: RodController::new(0.0, APOLLO_LANDER_THRUST_N),
         }
     }
 
@@ -144,21 +150,28 @@ impl Lander {
     }
 
     pub fn step(&mut self, dt: f32, controls: &Controls) {
-        // Gravity.
-        self.velocity += MOON_GRAVITY * Vec3::Z * dt;
+        // Update target rate of descent.
+        self.rod.set_target(controls.rate_of_descent());
 
         let total_mass = self.dry_mass + self.payload_mass + self.fuel_mass;
         if self.fuel_mass > 0.0 {
-            // Apply thrust.
-            let thrust = controls.thrust();
+            // Use rate-of-descent PID controller to determine throttle.
+            let throttle = self
+                .rod
+                .compute_throttle(self.velocity.z, total_mass, self.tilt(), dt);
+
+            // Apply throttle.
             let thrust_dir = self.rotation * Vec3::Z;
-            let thrust_force = thrust_dir * thrust * self.thrust_power;
+            let thrust_force = throttle * thrust_dir * self.thrust_power;
             self.velocity += (thrust_force / total_mass) * dt;
 
             // Consume fuel.
-            let fuel_consumed = thrust * APOLLO_LANDER_FUEL_BURN_RATE_KGPS * dt;
+            let fuel_consumed = throttle * APOLLO_LANDER_FUEL_BURN_RATE_KGPS * dt;
             self.fuel_mass = (self.fuel_mass - fuel_consumed).max(0.0);
         }
+
+        // Gravity.
+        self.velocity += MOON_GRAVITY * Vec3::Z * dt;
 
         // Apply torque.
         let torque = controls.rotation() * self.torque_power;
@@ -313,6 +326,7 @@ impl Lander {
         LANDER_ANGULAR_VELOCITY.log(&self.angular_velocity.into_fg());
         LANDER_FUEL_MASS.log(&self.fuel_mass.into_fg());
         LANDER_ORIENTATION.log(&self.rotation.into_fg());
+        LANDER_ROD_TARGET.log(&self.rod.target().into_fg());
         LANDER_VELOCITY.log(&self.velocity.into_fg());
         LANDER_COURSE.log(&(-self.position).into_fg());
         LANDER.log(&SceneUpdate {

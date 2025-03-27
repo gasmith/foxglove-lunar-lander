@@ -32,12 +32,11 @@ impl ServerListener for Listener {
                 return;
             }
         };
-        let thrust = msg.thrust();
-        let rotation = msg.rotation();
+        self.controls
+            .update(msg.rotation(), msg.delta_rate_of_descent());
         if msg.reset() {
             self.controls.request_reset();
         }
-        self.controls.update(thrust, rotation);
     }
 
     fn on_get_parameters(
@@ -99,27 +98,35 @@ impl GamepadMsg {
         }
     }
 
-    fn thrust(&self) -> f32 {
-        self.read_axes(Self::JOY_LY).max(0.0)
+    fn strafe(&self) -> Vec3 {
+        Vec3 {
+            x: self.read_axes(Self::JOY_LX),
+            y: self.read_axes(Self::JOY_LY),
+            z: 0.0,
+        }
     }
 
     fn pitch(&self) -> f32 {
         -self.read_axes(Self::JOY_RY)
     }
 
-    fn yaw(&self) -> f32 {
+    fn roll(&self) -> f32 {
         -self.read_axes(Self::JOY_RX)
     }
 
-    fn roll(&self) -> f32 {
+    fn yaw(&self) -> f32 {
         (self.buttons[Self::BUTTON_L2] - self.buttons[Self::BUTTON_R2]) / 2.0
     }
 
     fn rotation(&self) -> Vec3 {
         Vec3 {
             x: self.pitch(),
-            y: self.yaw(),
-            z: self.roll(),
+            y: self.roll(),
+            z: self.yaw(),
         }
+    }
+
+    fn delta_rate_of_descent(&self) -> f32 {
+        (self.buttons[Self::BUTTON_UP] - self.buttons[Self::BUTTON_DOWN]) * -0.2
     }
 }

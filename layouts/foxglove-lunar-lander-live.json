@@ -1,5 +1,17 @@
 {
   "configById": {
+    "Joystick Panel.Joystick!3xdth4t": {
+      "subJoyTopic": "/joy",
+      "pubJoyTopic": "/joy",
+      "publishMode": true,
+      "publishFrameId": "",
+      "dataSource": "gamepad",
+      "displayMode": "custom",
+      "debugGamepad": false,
+      "layoutName": "xbox",
+      "mapping_name": "TODO",
+      "gamepadId": 0
+    },
     "RawMessages!qwwh8a": {
       "diffEnabled": false,
       "diffMethod": "custom",
@@ -53,11 +65,11 @@
         "perspective": true,
         "distance": 19.99999999999999,
         "phi": 36.29999999999998,
-        "thetaOffset": 0.9278350515463915,
+        "thetaOffset": 0,
         "targetOffset": [
-          0.03918484545054792,
-          -0.09393185982035646,
-          0
+          -0.030779645203612795,
+          -0.1905601186886085,
+          -2.748947693221495e-20
         ],
         "target": [
           0,
@@ -221,18 +233,6 @@
       "imageMode": {},
       "foxglovePanelTitle": "Landing zone"
     },
-    "Joystick Panel.Joystick!3xdth4t": {
-      "subJoyTopic": "/joy",
-      "pubJoyTopic": "/joy",
-      "publishMode": true,
-      "publishFrameId": "",
-      "dataSource": "gamepad",
-      "displayMode": "custom",
-      "debugGamepad": false,
-      "layoutName": "xbox",
-      "mapping_name": "TODO",
-      "gamepadId": 0
-    },
     "Plot!1uw7vkz": {
       "paths": [
         {
@@ -247,12 +247,13 @@
       "showXAxisLabels": true,
       "showYAxisLabels": true,
       "showLegend": true,
-      "legendDisplay": "floating",
+      "legendDisplay": "none",
       "showPlotValuesInLegend": false,
       "isSynced": true,
       "xAxisVal": "timestamp",
       "sidebarDimension": 240,
-      "yAxisLabel": "kilograms"
+      "yAxisLabel": "kilograms",
+      "foxglovePanelTitle": "Fuel"
     },
     "Plot!1vt8ayk": {
       "paths": [
@@ -277,6 +278,35 @@
       "foxglovePanelTitle": "Altitude",
       "yAxisLabel": "meters"
     },
+    "Plot!5ixygs": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/lander_rod_target.value",
+          "enabled": true,
+          "color": "#a395e2",
+          "label": "target",
+          "showLine": true
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/lander_velocity.z",
+          "enabled": true,
+          "color": "#f7df71",
+          "label": "actual"
+        }
+      ],
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": false,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "foxglovePanelTitle": "Vertical velocity",
+      "yAxisLabel": "meters"
+    },
     "Plot!2cbt9r8": {
       "paths": [
         {
@@ -292,13 +322,6 @@
           "enabled": true,
           "color": "#f5774d",
           "label": "y"
-        },
-        {
-          "timestampMethod": "receiveTime",
-          "value": "/lander_velocity.z",
-          "enabled": true,
-          "color": "#f7df71",
-          "label": "z"
         }
       ],
       "showXAxisLabels": true,
@@ -309,7 +332,7 @@
       "isSynced": true,
       "xAxisVal": "timestamp",
       "sidebarDimension": 240,
-      "foxglovePanelTitle": "Velocity",
+      "foxglovePanelTitle": "Horizontal velocity",
       "yAxisLabel": "meters/sec"
     },
     "Parameters!2jpo33q": {
@@ -323,10 +346,15 @@
           "layout": {
             "first": {
               "first": {
-                "first": "RawMessages!qwwh8a",
+                "first": {
+                  "first": "Joystick Panel.Joystick!3xdth4t",
+                  "second": "RawMessages!qwwh8a",
+                  "direction": "column",
+                  "splitPercentage": 14.864864864864863
+                },
                 "second": "Plot!1odyly4",
                 "direction": "column",
-                "splitPercentage": 48.561151079136685
+                "splitPercentage": 42.44741873804971
               },
               "second": "foxglove-navball.Navball!270y3x5",
               "direction": "column",
@@ -340,24 +368,24 @@
               },
               "second": {
                 "first": {
-                  "first": "Joystick Panel.Joystick!3xdth4t",
+                  "first": "Plot!1uw7vkz",
                   "second": {
-                    "first": "Plot!1uw7vkz",
-                    "second": "Plot!1vt8ayk",
+                    "first": "Plot!1vt8ayk",
+                    "second": "Plot!5ixygs",
                     "direction": "column"
                   },
                   "direction": "column",
-                  "splitPercentage": 7.082248128406196
+                  "splitPercentage": 29.623287671232873
                 },
                 "second": "Plot!2cbt9r8",
                 "direction": "column",
-                "splitPercentage": 62.81287246722288
+                "splitPercentage": 69.6066746126341
               },
               "direction": "row",
               "splitPercentage": 69.19967663702508
             },
             "direction": "row",
-            "splitPercentage": 19.36114732724902
+            "splitPercentage": 23.402868318122554
           }
         },
         {
