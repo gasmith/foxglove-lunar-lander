@@ -13,8 +13,9 @@ use landing_zone::LandingZone;
 use crate::parameters::Parameters;
 
 pub const DEFAULT_LANDSCAPE_WIDTH: u32 = 200;
+pub const DEFAULT_LANDING_ZONE_MIN_DISTANCE: u32 = 30;
 pub const DEFAULT_LANDING_ZONE_MAX_DISTANCE: u32 = 70;
-pub const DEFAULT_LANDING_ZONE_RADIUS: u32 = 10;
+pub const DEFAULT_LANDING_ZONE_RADIUS: u32 = 20;
 pub const DEFAULT_LANDER_START_ALTITUDE: u32 = 200;
 
 static_typed_channel!(LANDSCAPE, "/landscape", SceneUpdate);
@@ -31,6 +32,7 @@ impl Landscape {
         let mut height_map = HeightMap::new(rng, params.landscape_width());
         let landing_zone_center = height_map.create_random_landing_zone(
             rng,
+            params.landing_zone_min_distance(),
             params.landing_zone_max_distance(),
             params.landing_zone_radius(),
         );

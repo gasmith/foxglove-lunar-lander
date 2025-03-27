@@ -1,18 +1,6 @@
 {
   "configById": {
-    "Joystick Panel.Joystick!3xdth4t": {
-      "subJoyTopic": "/joy",
-      "pubJoyTopic": "/joy",
-      "publishMode": true,
-      "publishFrameId": "",
-      "dataSource": "gamepad",
-      "displayMode": "custom",
-      "debugGamepad": false,
-      "layoutName": "xbox",
-      "mapping_name": "TODO",
-      "gamepadId": 0
-    },
-    "RawMessages!qwwh8a": {
+    "RawMessages!4kiypw": {
       "diffEnabled": false,
       "diffMethod": "custom",
       "diffTopicPath": "",
@@ -54,7 +42,7 @@
       "xAxisVal": "timestamp",
       "sidebarDimension": 240,
       "foxglovePanelTitle": "Angular velocity",
-      "yAxisLabel": "radians/sec"
+      "yAxisLabel": "radian/s"
     },
     "foxglove-navball.Navball!270y3x5": {
       "topic": "/lander_orientation",
@@ -62,18 +50,17 @@
     },
     "3D!2un5fuq": {
       "cameraState": {
-        "perspective": true,
         "distance": 19.99999999999999,
+        "perspective": true,
         "phi": 36.29999999999998,
-        "thetaOffset": 0,
-        "targetOffset": [
-          -0.030779645203612795,
-          -0.1905601186886085,
-          -2.748947693221495e-20
-        ],
         "target": [
           0,
           0,
+          0
+        ],
+        "targetOffset": [
+          0.03918484545054792,
+          -0.09393185982035646,
           0
         ],
         "targetOrientation": [
@@ -82,6 +69,7 @@
           0,
           1
         ],
+        "thetaOffset": 0,
         "fovy": 45,
         "near": 0.5,
         "far": 5000
@@ -270,7 +258,7 @@
       "showXAxisLabels": true,
       "showYAxisLabels": true,
       "showLegend": true,
-      "legendDisplay": "floating",
+      "legendDisplay": "none",
       "showPlotValuesInLegend": false,
       "isSynced": true,
       "xAxisVal": "timestamp",
@@ -278,15 +266,14 @@
       "foxglovePanelTitle": "Altitude",
       "yAxisLabel": "meters"
     },
-    "Plot!5ixygs": {
+    "Plot!2cbt9r8": {
       "paths": [
         {
           "timestampMethod": "receiveTime",
           "value": "/lander_rod_target.value",
           "enabled": true,
-          "color": "#a395e2",
-          "label": "target",
-          "showLine": true
+          "color": "#4e98e2",
+          "label": "target"
         },
         {
           "timestampMethod": "receiveTime",
@@ -305,9 +292,9 @@
       "xAxisVal": "timestamp",
       "sidebarDimension": 240,
       "foxglovePanelTitle": "Vertical velocity",
-      "yAxisLabel": "meters"
+      "yAxisLabel": "meters/s"
     },
-    "Plot!2cbt9r8": {
+    "Plot!3ljs3jp": {
       "paths": [
         {
           "timestampMethod": "receiveTime",
@@ -333,9 +320,9 @@
       "xAxisVal": "timestamp",
       "sidebarDimension": 240,
       "foxglovePanelTitle": "Horizontal velocity",
-      "yAxisLabel": "meters/sec"
+      "yAxisLabel": "meters/s"
     },
-    "Parameters!2jpo33q": {
+    "Parameters!34toibq": {
       "title": "Parameters"
     },
     "Tab!2axo8zo": {
@@ -347,14 +334,14 @@
             "first": {
               "first": {
                 "first": {
-                  "first": "Joystick Panel.Joystick!3xdth4t",
-                  "second": "RawMessages!qwwh8a",
+                  "first": "Joystick Panel.Joystick!3yaz8vw",
+                  "second": "RawMessages!4kiypw",
                   "direction": "column",
-                  "splitPercentage": 14.864864864864863
+                  "splitPercentage": 13.492462426427561
                 },
                 "second": "Plot!1odyly4",
                 "direction": "column",
-                "splitPercentage": 42.44741873804971
+                "splitPercentage": 48.561151079136685
               },
               "second": "foxglove-navball.Navball!270y3x5",
               "direction": "column",
@@ -369,30 +356,42 @@
               "second": {
                 "first": {
                   "first": "Plot!1uw7vkz",
-                  "second": {
-                    "first": "Plot!1vt8ayk",
-                    "second": "Plot!5ixygs",
-                    "direction": "column"
-                  },
+                  "second": "Plot!1vt8ayk",
                   "direction": "column",
-                  "splitPercentage": 29.623287671232873
+                  "splitPercentage": 49.470899470899475
                 },
-                "second": "Plot!2cbt9r8",
+                "second": {
+                  "first": "Plot!2cbt9r8",
+                  "second": "Plot!3ljs3jp",
+                  "direction": "column"
+                },
                 "direction": "column",
-                "splitPercentage": 69.6066746126341
+                "splitPercentage": 49.80237154150198
               },
               "direction": "row",
-              "splitPercentage": 69.19967663702508
+              "splitPercentage": 62.910381543921936
             },
             "direction": "row",
-            "splitPercentage": 23.402868318122554
+            "splitPercentage": 26.531942633637552
           }
         },
         {
           "title": "Config",
-          "layout": "Parameters!2jpo33q"
+          "layout": "Parameters!34toibq"
         }
       ]
+    },
+    "Joystick Panel.Joystick!3yaz8vw": {
+      "subJoyTopic": "/joy",
+      "pubJoyTopic": "/joy",
+      "publishMode": true,
+      "publishFrameId": "",
+      "dataSource": "gamepad",
+      "displayMode": "custom",
+      "debugGamepad": false,
+      "layoutName": "xbox",
+      "mapping_name": "TODO",
+      "gamepadId": 0
     }
   },
   "globalVariables": {},

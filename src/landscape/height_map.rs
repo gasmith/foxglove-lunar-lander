@@ -47,11 +47,12 @@ impl HeightMap {
     pub fn create_random_landing_zone<R: Rng>(
         &mut self,
         rng: &mut R,
+        min_distance: u32,
         max_distance: u32,
         radius: u32,
     ) -> Vec3 {
         let angle = rng.random_range(0.0..std::f32::consts::TAU);
-        let len = rng.random_range(0.0..(max_distance as f32));
+        let len = rng.random_range((min_distance as f32)..(max_distance as f32));
         let delta = Vec2::new(angle.cos(), angle.sin()) * len;
         let vec = delta + self.center2();
         self.create_landing_zone(vec.x as u32, vec.y as u32, radius)

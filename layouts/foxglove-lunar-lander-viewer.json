@@ -50,18 +50,17 @@
     },
     "3D!2un5fuq": {
       "cameraState": {
-        "perspective": true,
         "distance": 19.99999999999999,
+        "perspective": true,
         "phi": 36.29999999999998,
-        "thetaOffset": 0.9278350515463915,
-        "targetOffset": [
-          0.03918484545054792,
-          -0.09393185982035646,
-          0
-        ],
         "target": [
           0,
           0,
+          0
+        ],
+        "targetOffset": [
+          0.03918484545054792,
+          -0.09393185982035646,
           0
         ],
         "targetOrientation": [
@@ -70,6 +69,7 @@
           0,
           1
         ],
+        "thetaOffset": 0,
         "fovy": 45,
         "near": 0.5,
         "far": 5000
@@ -235,12 +235,13 @@
       "showXAxisLabels": true,
       "showYAxisLabels": true,
       "showLegend": true,
-      "legendDisplay": "floating",
+      "legendDisplay": "none",
       "showPlotValuesInLegend": false,
       "isSynced": true,
       "xAxisVal": "timestamp",
       "sidebarDimension": 240,
-      "yAxisLabel": "kilograms"
+      "yAxisLabel": "kilograms",
+      "foxglovePanelTitle": "Fuel"
     },
     "Plot!1vt8ayk": {
       "paths": [
@@ -257,7 +258,7 @@
       "showXAxisLabels": true,
       "showYAxisLabels": true,
       "showLegend": true,
-      "legendDisplay": "floating",
+      "legendDisplay": "none",
       "showPlotValuesInLegend": false,
       "isSynced": true,
       "xAxisVal": "timestamp",
@@ -266,6 +267,34 @@
       "yAxisLabel": "meters"
     },
     "Plot!2cbt9r8": {
+      "paths": [
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/lander_rod_target.value",
+          "enabled": true,
+          "color": "#4e98e2",
+          "label": "target"
+        },
+        {
+          "timestampMethod": "receiveTime",
+          "value": "/lander_velocity.z",
+          "enabled": true,
+          "color": "#f7df71",
+          "label": "actual"
+        }
+      ],
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "showLegend": true,
+      "legendDisplay": "floating",
+      "showPlotValuesInLegend": false,
+      "isSynced": true,
+      "xAxisVal": "timestamp",
+      "sidebarDimension": 240,
+      "foxglovePanelTitle": "Vertical velocity",
+      "yAxisLabel": "meters/s"
+    },
+    "Plot!3ljs3jp": {
       "paths": [
         {
           "timestampMethod": "receiveTime",
@@ -280,13 +309,6 @@
           "enabled": true,
           "color": "#f5774d",
           "label": "y"
-        },
-        {
-          "timestampMethod": "receiveTime",
-          "value": "/lander_velocity.z",
-          "enabled": true,
-          "color": "#f7df71",
-          "label": "z"
         }
       ],
       "showXAxisLabels": true,
@@ -297,7 +319,7 @@
       "isSynced": true,
       "xAxisVal": "timestamp",
       "sidebarDimension": 240,
-      "foxglovePanelTitle": "Velocity",
+      "foxglovePanelTitle": "Horizontal velocity",
       "yAxisLabel": "meters/s"
     },
     "Tab!2axo8zo": {
@@ -327,17 +349,22 @@
                 "first": {
                   "first": "Plot!1uw7vkz",
                   "second": "Plot!1vt8ayk",
+                  "direction": "column",
+                  "splitPercentage": 49.470899470899475
+                },
+                "second": {
+                  "first": "Plot!2cbt9r8",
+                  "second": "Plot!3ljs3jp",
                   "direction": "column"
                 },
-                "second": "Plot!2cbt9r8",
                 "direction": "column",
-                "splitPercentage": 62.81287246722288
+                "splitPercentage": 49.80237154150198
               },
               "direction": "row",
-              "splitPercentage": 69.19967663702508
+              "splitPercentage": 62.910381543921936
             },
             "direction": "row",
-            "splitPercentage": 19.36114732724902
+            "splitPercentage": 26.531942633637552
           }
         }
       ]

@@ -5,8 +5,8 @@ use foxglove::websocket::{Parameter, ParameterValue};
 use parking_lot::RwLock;
 
 use crate::landscape::{
-    DEFAULT_LANDER_START_ALTITUDE, DEFAULT_LANDING_ZONE_MAX_DISTANCE, DEFAULT_LANDING_ZONE_RADIUS,
-    DEFAULT_LANDSCAPE_WIDTH,
+    DEFAULT_LANDER_START_ALTITUDE, DEFAULT_LANDING_ZONE_MAX_DISTANCE,
+    DEFAULT_LANDING_ZONE_MIN_DISTANCE, DEFAULT_LANDING_ZONE_RADIUS, DEFAULT_LANDSCAPE_WIDTH,
 };
 
 #[derive(Default, Clone)]
@@ -19,6 +19,10 @@ impl Parameters {
 
     pub fn landscape_width(&self) -> u32 {
         self.0.read().landscape_width
+    }
+
+    pub fn landing_zone_min_distance(&self) -> u32 {
+        self.0.read().landing_zone_min_distance
     }
 
     pub fn landing_zone_max_distance(&self) -> u32 {
@@ -49,6 +53,8 @@ struct Inner {
     regenerate_seed: bool,
     /// Landscape width.
     landscape_width: u32,
+    /// Min landing zone distance from landscape center.
+    landing_zone_min_distance: u32,
     /// Max landing zone distance from landscape center.
     landing_zone_max_distance: u32,
     /// Landing zone radius.
@@ -63,6 +69,7 @@ impl Default for Inner {
             seed: 0,
             regenerate_seed: true,
             landscape_width: DEFAULT_LANDSCAPE_WIDTH,
+            landing_zone_min_distance: DEFAULT_LANDING_ZONE_MIN_DISTANCE,
             landing_zone_max_distance: DEFAULT_LANDING_ZONE_MAX_DISTANCE,
             landing_zone_radius: DEFAULT_LANDING_ZONE_RADIUS,
             lander_start_altitude: DEFAULT_LANDER_START_ALTITUDE,
@@ -133,7 +140,7 @@ impl Inner {
     fn set(&mut self, params: Vec<Parameter>) -> Vec<Parameter> {
         params
             .into_iter()
-            .filter_map(|n| match (n.name.as_str(), &n.value) {
+            .filter_map(|mut n| match (n.name.as_str(), &mut n.value) {
                 ("seed", Some(ParameterValue::String(v))) if v.len() == 8 => {
                     self.seed = v.as_slice().get_u64_le();
                     Some(n)
@@ -142,25 +149,28 @@ impl Inner {
                     self.regenerate_seed = *v;
                     Some(n)
                 }
-                ("landscape_width", Some(ParameterValue::Number(v))) if *v > 0.0 && *v < 1000.0 => {
+                ("landscape_width", Some(ParameterValue::Number(v))) => {
+                    *v = v.clamp(0.0, 500.0);
                     self.landscape_width = *v as u32;
                     Some(n)
                 }
-                ("landing_zone_max_distance", Some(ParameterValue::Number(v)))
-                    if *v > 0.0 && *v < 1000.0 =>
-                {
+                ("landing_zone_min_distance", Some(ParameterValue::Number(v))) => {
+                    *v = v.clamp(0.0, 200.0);
+                    self.landing_zone_min_distance = *v as u32;
+                    Some(n)
+                }
+                ("landing_zone_max_distance", Some(ParameterValue::Number(v))) => {
+                    *v = v.clamp(0.0, 200.0);
                     self.landing_zone_max_distance = *v as u32;
                     Some(n)
                 }
-                ("landing_zone_radius", Some(ParameterValue::Number(v)))
-                    if *v > 0.0 && *v < 1000.0 =>
-                {
+                ("landing_zone_radius", Some(ParameterValue::Number(v))) => {
+                    *v = v.clamp(0.0, 50.0);
                     self.landing_zone_radius = *v as u32;
                     Some(n)
                 }
-                ("lander_start_altitude", Some(ParameterValue::Number(v)))
-                    if *v > 0.0 && *v < 1000.0 =>
-                {
+                ("lander_start_altitude", Some(ParameterValue::Number(v))) => {
+                    *v = v.clamp(0.0, 1000.0);
                     self.lander_start_altitude = *v as u32;
                     Some(n)
                 }
