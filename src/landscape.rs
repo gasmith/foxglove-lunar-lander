@@ -1,7 +1,5 @@
-use foxglove::{
-    schemas::{FrameTransform, SceneUpdate, Vector3},
-    static_typed_channel,
-};
+use foxglove::schemas::{FrameTransform, SceneUpdate, Vector3};
+use foxglove::static_typed_channel;
 use glam::Vec3;
 use rand::prelude::*;
 
@@ -13,13 +11,13 @@ use landing_zone::LandingZone;
 use crate::parameters::Parameters;
 
 static_typed_channel!(LANDSCAPE, "/landscape", SceneUpdate);
-static_typed_channel!(LANDSCAPE_FT, "/landscape_ft", FrameTransform);
 
 pub struct Landscape {
     frame_transform: FrameTransform,
     scene_update: SceneUpdate,
     landing_zone: LandingZone,
     lander_init_position: Vec3,
+    hidden: bool,
 }
 impl Landscape {
     pub fn new<R: Rng>(rng: &mut R, params: &Parameters) -> Self {
@@ -51,16 +49,31 @@ impl Landscape {
             scene_update,
             landing_zone: landing_zone_center.into(),
             lander_init_position,
+            hidden: false,
         }
+    }
+
+    pub fn set_hidden(&mut self, hidden: bool) {
+        self.hidden = hidden;
     }
 
     pub fn lander_init_position(&self) -> Vec3 {
         self.lander_init_position
     }
 
-    pub fn log_static(&self) {
-        LANDSCAPE_FT.log_static(&self.frame_transform);
-        LANDSCAPE.log_static(&self.scene_update);
-        self.landing_zone.log_static();
+    pub fn frame_transforms(&self) -> Vec<FrameTransform> {
+        vec![
+            self.frame_transform.clone(),
+            self.landing_zone.frame_transform(),
+        ]
+    }
+
+    pub fn log_scene(&self) {
+        if self.hidden {
+            LANDSCAPE.log(&SceneUpdate::default());
+        } else {
+            LANDSCAPE.log(&self.scene_update);
+            self.landing_zone.log_scene();
+        }
     }
 }

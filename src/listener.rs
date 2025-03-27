@@ -21,6 +21,13 @@ impl Listener {
     }
 }
 impl ServerListener for Listener {
+    fn on_client_advertise(&self, _client: Client, channel: &ClientChannel) {
+        // When a client advertises a new joystick, do a hard reset to discard button-press state.
+        if channel.schema_name == "sensor_msgs/Joy" {
+            self.controls.hard_reset();
+        }
+    }
+
     fn on_message_data(&self, _client: Client, channel: &ClientChannel, payload: &[u8]) {
         if channel.schema_name != "sensor_msgs/Joy" {
             return;
@@ -33,11 +40,11 @@ impl ServerListener for Listener {
             }
         };
         self.controls.update(
+            msg.reset(),
             msg.strafe(),
             msg.rotate(),
             msg.inc_vertical_velocity(),
             msg.dec_vertical_velocity(),
-            msg.reset(),
         );
     }
 

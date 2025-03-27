@@ -20,63 +20,77 @@ impl Controls {
             - inner.dec_vertical_velocity.get_and_reset() as f32)
     }
 
-    pub fn is_reset_pending(&self) -> bool {
-        self.0.read().reset
+    pub fn get_reset_requested(&self) -> bool {
+        self.0.read().reset.get() > 0
     }
 
-    pub fn do_reset(&self) {
+    /// Resets all values and button-press state.
+    pub fn hard_reset(&self) {
+        self.reset(true);
+    }
+
+    /// Resets all values, but retains button-press state.
+    pub fn soft_reset(&self) {
+        self.reset(false);
+    }
+
+    fn reset(&self, hard: bool) {
         let mut inner = self.0.write();
-        inner.reset = false;
+        inner.reset.reset(hard);
         inner.strafe = Vec2::ZERO;
         inner.rotate = Vec3::ZERO;
-        inner.inc_vertical_velocity.reset();
-        inner.dec_vertical_velocity.reset();
+        inner.inc_vertical_velocity.reset(hard);
+        inner.dec_vertical_velocity.reset(hard);
     }
 
     pub fn update(
         &self,
+        reset: bool,
         strafe: Vec2,
         rotate: Vec3,
         inc_vertical_velocity: bool,
         dec_vertical_velocity: bool,
-        request_reset: bool,
     ) {
         let mut inner = self.0.write();
+        inner.reset.update(reset);
         inner.strafe = strafe;
         inner.rotate = rotate;
         inner.inc_vertical_velocity.update(inc_vertical_velocity);
         inner.dec_vertical_velocity.update(dec_vertical_velocity);
-        inner.reset |= request_reset;
     }
 }
 
 #[derive(Default)]
 struct Inner {
-    reset: bool,
+    reset: Button,
     strafe: Vec2,
     rotate: Vec3,
-    inc_vertical_velocity: TapCounter,
-    dec_vertical_velocity: TapCounter,
+    inc_vertical_velocity: Button,
+    dec_vertical_velocity: Button,
 }
 
 #[derive(Default)]
-struct TapCounter {
-    latch: bool,
+struct Button {
+    pressed: bool,
     count: u32,
 }
 
-impl TapCounter {
+impl Button {
     fn update(&mut self, pressed: bool) {
-        match (pressed, self.latch) {
+        match (pressed, self.pressed) {
             (true, false) => {
-                self.latch = true;
+                self.pressed = true;
                 self.count += 1;
             }
             (false, true) => {
-                self.latch = false;
+                self.pressed = false;
             }
             _ => (),
         }
+    }
+
+    fn get(&self) -> u32 {
+        self.count
     }
 
     fn get_and_reset(&mut self) -> u32 {
@@ -85,8 +99,10 @@ impl TapCounter {
         value
     }
 
-    fn reset(&mut self) {
+    fn reset(&mut self, hard: bool) {
         self.count = 0;
-        self.latch = false;
+        if hard {
+            self.pressed = false;
+        }
     }
 }

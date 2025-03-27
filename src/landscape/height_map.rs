@@ -105,6 +105,7 @@ impl HeightMap {
 
     pub fn scene_entity(&self) -> SceneEntity {
         SceneEntity {
+            id: "landscape".into(),
             frame_id: "landscape".into(),
             triangles: (0..(self.width - 1))
                 .map(|ix| TriangleListPrimitive {

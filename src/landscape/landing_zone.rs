@@ -1,13 +1,12 @@
-use foxglove::{
-    schemas::{Color, FrameTransform, SceneEntity, SceneUpdate, SpherePrimitive, Vector3},
-    static_typed_channel,
+use foxglove::schemas::{
+    Color, FrameTransform, SceneEntity, SceneUpdate, SpherePrimitive, Vector3,
 };
+use foxglove::static_typed_channel;
 use glam::Vec3;
 
 use crate::convert::IntoFg;
 
 static_typed_channel!(LANDING_ZONE, "/landing_zone", SceneUpdate);
-static_typed_channel!(LANDING_ZONE_FT, "/landing_zone_ft", FrameTransform);
 
 pub struct LandingZone {
     frame_transform: FrameTransform,
@@ -28,6 +27,7 @@ impl LandingZone {
         };
         let scene_update = SceneUpdate {
             entities: vec![SceneEntity {
+                id: "landing_zone".into(),
                 frame_id: "landing_zone".into(),
                 spheres: vec![SpherePrimitive {
                     size: Some(Vector3 {
@@ -53,8 +53,11 @@ impl LandingZone {
         }
     }
 
-    pub fn log_static(&self) {
-        LANDING_ZONE_FT.log_static(&self.frame_transform);
-        LANDING_ZONE.log_static(&self.scene_update);
+    pub fn frame_transform(&self) -> FrameTransform {
+        self.frame_transform.clone()
+    }
+
+    pub fn log_scene(&self) {
+        LANDING_ZONE.log(&self.scene_update);
     }
 }
