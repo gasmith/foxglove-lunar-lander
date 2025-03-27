@@ -39,16 +39,22 @@ const APOLLO_LANDER_PAYLOAD_MASS_KG: f32 = 2_150.0 + 2_400.0;
 const APOLLO_LANDER_INITIAL_FUEL_MASS_KG: f32 = 600.0;
 
 /// Main descent thrust power in newtons.
-const APOLLO_LANDER_THRUST_N: f32 = 45_000.0;
+const APOLLO_LANDER_DCS_THRUST_N: f32 = 45_000.0;
 
 /// Descent fuel burn rate at full thrust, in kg/s.
 const APOLLO_LANDER_FUEL_BURN_RATE_KGPS: f32 = 15.0;
 
-/// RCS thrust power in newton-meters.
+/// RCS thrust for strafing.
+///
+/// The module had sixteen 440N thrusters arranged in quads. For any direction, there are two
+/// thrusters to use.
+const APOLLO_LANDER_RCS_THRUST_N: f32 = 880.0;
+
+/// RCS torque in newton-meters.
 ///
 /// The module had sixteen 440N thrusters arranged in quads, and we're estimating that they're
 /// about 2m from the center of mass.
-const APOLLO_LANDER_TORQUE_NM: f32 = 3700.0;
+const APOLLO_LANDER_RCS_TORQUE_NM: f32 = 3700.0;
 
 /// Estimated inertial profile for the lunar lander.
 ///
@@ -121,8 +127,9 @@ pub struct Lander {
     dry_mass: f32,
     payload_mass: f32,
     fuel_mass: f32,
-    thrust_power: f32,
-    torque_power: f32,
+    dcs_thrust: f32,
+    rcs_thrust: f32,
+    rcs_torque: f32,
     landing_zone_radius: u32,
     rod: RodController,
 }
@@ -137,10 +144,11 @@ impl Lander {
             dry_mass: APOLLO_LANDER_DRY_MASS_KG,
             payload_mass: APOLLO_LANDER_PAYLOAD_MASS_KG,
             fuel_mass: APOLLO_LANDER_INITIAL_FUEL_MASS_KG,
-            thrust_power: APOLLO_LANDER_THRUST_N,
-            torque_power: APOLLO_LANDER_TORQUE_NM,
+            dcs_thrust: APOLLO_LANDER_DCS_THRUST_N,
+            rcs_thrust: APOLLO_LANDER_RCS_THRUST_N,
+            rcs_torque: APOLLO_LANDER_RCS_TORQUE_NM,
             landing_zone_radius,
-            rod: RodController::new(0.0, APOLLO_LANDER_THRUST_N),
+            rod: RodController::new(0.0, APOLLO_LANDER_DCS_THRUST_N),
         }
     }
 
@@ -155,14 +163,14 @@ impl Lander {
 
         let total_mass = self.dry_mass + self.payload_mass + self.fuel_mass;
         if self.fuel_mass > 0.0 {
-            // Use rate-of-descent PID controller to determine throttle.
+            // Use rate-of-descent PID controller to compute throttle.
             let throttle = self
                 .rod
                 .compute_throttle(self.velocity.z, total_mass, self.tilt(), dt);
 
             // Apply throttle.
             let thrust_dir = self.rotation * Vec3::Z;
-            let thrust_force = throttle * thrust_dir * self.thrust_power;
+            let thrust_force = throttle * thrust_dir * self.dcs_thrust;
             self.velocity += (thrust_force / total_mass) * dt;
 
             // Consume fuel.
@@ -170,11 +178,16 @@ impl Lander {
             self.fuel_mass = (self.fuel_mass - fuel_consumed).max(0.0);
         }
 
-        // Gravity.
+        // Apply strafe.
+        let strafe = controls.strafe();
+        let strafe_force = self.rotation * Vec3::new(strafe.x, strafe.y, 0.0) * self.rcs_thrust;
+        self.velocity += (strafe_force / total_mass) * dt;
+
+        // Apply gravity.
         self.velocity += MOON_GRAVITY * Vec3::Z * dt;
 
         // Apply torque.
-        let torque = controls.rotation() * self.torque_power;
+        let torque = controls.rotate() * self.rcs_torque;
         let inertia = total_mass * APOLLO_LANDER_INERTIA;
         self.angular_velocity += (torque / inertia) * dt;
 

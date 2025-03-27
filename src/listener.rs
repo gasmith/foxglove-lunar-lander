@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use foxglove::websocket::{Client, ClientChannel, ServerListener};
-use glam::Vec3;
+use glam::{Vec2, Vec3};
 use serde::Deserialize;
 
 use crate::controls::Controls;
@@ -33,7 +33,7 @@ impl ServerListener for Listener {
             }
         };
         self.controls
-            .update(msg.rotation(), msg.delta_rate_of_descent());
+            .update(msg.strafe(), msg.rotate(), msg.delta_rate_of_descent());
         if msg.reset() {
             self.controls.request_reset();
         }
@@ -98,11 +98,10 @@ impl GamepadMsg {
         }
     }
 
-    fn strafe(&self) -> Vec3 {
-        Vec3 {
+    fn strafe(&self) -> Vec2 {
+        Vec2 {
             x: self.read_axes(Self::JOY_LX),
             y: self.read_axes(Self::JOY_LY),
-            z: 0.0,
         }
     }
 
@@ -118,7 +117,7 @@ impl GamepadMsg {
         (self.buttons[Self::BUTTON_L2] - self.buttons[Self::BUTTON_R2]) / 2.0
     }
 
-    fn rotation(&self) -> Vec3 {
+    fn rotate(&self) -> Vec3 {
         Vec3 {
             x: self.pitch(),
             y: self.roll(),
@@ -127,6 +126,6 @@ impl GamepadMsg {
     }
 
     fn delta_rate_of_descent(&self) -> f32 {
-        (self.buttons[Self::BUTTON_UP] - self.buttons[Self::BUTTON_DOWN]) * -0.2
+        (self.buttons[Self::BUTTON_UP] - self.buttons[Self::BUTTON_DOWN]) * 0.1
     }
 }

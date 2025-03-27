@@ -1,13 +1,17 @@
 use std::sync::Arc;
 
-use glam::Vec3;
+use glam::{Vec2, Vec3};
 use parking_lot::RwLock;
 
 #[derive(Default, Clone)]
 pub struct Controls(Arc<RwLock<Inner>>);
 impl Controls {
-    pub fn rotation(&self) -> Vec3 {
-        self.0.read().rotation
+    pub fn strafe(&self) -> Vec2 {
+        self.0.read().strafe
+    }
+
+    pub fn rotate(&self) -> Vec3 {
+        self.0.read().rotate
     }
 
     pub fn rate_of_descent(&self) -> f32 {
@@ -26,12 +30,13 @@ impl Controls {
         let mut inner = self.0.write();
         inner.reset = false;
         inner.rate_of_descent = 0.0;
-        inner.rotation = Vec3::ZERO;
+        inner.rotate = Vec3::ZERO;
     }
 
-    pub fn update(&self, rotation: Vec3, delta_rate_of_descent: f32) {
+    pub fn update(&self, strafe: Vec2, rotate: Vec3, delta_rate_of_descent: f32) {
         let mut inner = self.0.write();
-        inner.rotation = rotation;
+        inner.strafe = strafe;
+        inner.rotate = rotate;
         inner.rate_of_descent += delta_rate_of_descent;
     }
 }
@@ -39,6 +44,7 @@ impl Controls {
 #[derive(Default)]
 struct Inner {
     reset: bool,
+    strafe: Vec2,
+    rotate: Vec3,
     rate_of_descent: f32,
-    rotation: Vec3,
 }
