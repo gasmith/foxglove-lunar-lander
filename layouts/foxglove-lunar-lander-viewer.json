@@ -88,10 +88,6 @@
       "foxglovePanelTitle": "Angular velocity",
       "yAxisLabel": "radian/s"
     },
-    "foxglove-navball.Navball!270y3x5": {
-      "topic": "/lander_orientation",
-      "course_topic": "/lander_course"
-    },
     "3D!2un5fuq": {
       "cameraState": {
         "distance": 19.99999999999999,
@@ -383,7 +379,7 @@
                 "direction": "column",
                 "splitPercentage": 29.254302103250478
               },
-              "second": "foxglove-navball.Navball!270y3x5",
+              "second": "Foxglove Navball.Navball!16w0ngp",
               "direction": "column",
               "splitPercentage": 68.89153754469606
             },
@@ -416,6 +412,9 @@
           }
         }
       ]
+    },
+    "Foxglove Navball.Navball!16w0ngp": {
+      "topic": "/lander_orientation"
     }
   },
   "globalVariables": {},
