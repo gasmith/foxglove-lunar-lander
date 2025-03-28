@@ -30,7 +30,7 @@ impl Banner {
         })
     }
     pub fn press_start() -> Self {
-        Self::new("PRESS_START", 1.0, 0.0, 1.0)
+        Self::new("PRESS START", 1.0, 0.0, 1.0)
     }
 
     pub fn landing_status(status: LandingStatus) -> Self {
