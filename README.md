@@ -5,6 +5,8 @@ The simulator is written against the Foxglove SDK, as a way to demo some of its 
 
 In this game, you're piloting an Apollo lunar lander.
 
+![Screenshot](docs/screenshot.png)
+
 ## Prerequisites
 
 You'll want to use a gamepad for this.
