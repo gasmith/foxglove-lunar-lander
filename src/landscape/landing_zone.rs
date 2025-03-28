@@ -19,6 +19,7 @@ impl From<Vec3> for LandingZone {
 }
 impl LandingZone {
     pub fn new(center: Vec3) -> Self {
+        let _ = *LANDING_ZONE;
         let frame_transform = FrameTransform {
             parent_frame_id: "landscape".into(),
             child_frame_id: "landing_zone".into(),

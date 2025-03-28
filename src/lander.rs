@@ -26,6 +26,17 @@ static_typed_channel!(LANDER_METRICS, "/lander_metrics", LanderMetrics);
 static_typed_channel!(LANDER_ORIENTATION, "/lander_orientation", Quaternion);
 static_typed_channel!(LANDER_VELOCITY, "/lander_velocity", Vector3);
 
+fn init_channels() {
+    let _ = (
+        &*LANDER,
+        &*LANDER_ANGULAR_VELOCITY,
+        &*LANDER_COURSE,
+        &*LANDER_METRICS,
+        &*LANDER_ORIENTATION,
+        &*LANDER_VELOCITY,
+    );
+}
+
 /// Base mass for the apollo lander.
 const APOLLO_LANDER_DRY_MASS_KG: f32 = 2_150.0;
 
@@ -94,6 +105,7 @@ impl Lander {
         vertical_velocity_target: f32,
         landing_zone_radius: u32,
     ) -> Self {
+        init_channels();
         Self {
             position,
             velocity: Vec3::Z * vertical_velocity,

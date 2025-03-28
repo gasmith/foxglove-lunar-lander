@@ -17,10 +17,10 @@ pub struct Landscape {
     scene_update: SceneUpdate,
     landing_zone: LandingZone,
     lander_init_position: Vec3,
-    hidden: bool,
 }
 impl Landscape {
     pub fn new<R: Rng>(rng: &mut R, params: &Parameters) -> Self {
+        let _ = *LANDSCAPE;
         let mut height_map = HeightMap::new(rng, params.landscape_width());
         let landing_zone_center = height_map.create_random_landing_zone(
             rng,
@@ -49,12 +49,7 @@ impl Landscape {
             scene_update,
             landing_zone: landing_zone_center.into(),
             lander_init_position,
-            hidden: false,
         }
-    }
-
-    pub fn set_hidden(&mut self, hidden: bool) {
-        self.hidden = hidden;
     }
 
     pub fn lander_init_position(&self) -> Vec3 {
@@ -69,11 +64,7 @@ impl Landscape {
     }
 
     pub fn log_scene(&self) {
-        if self.hidden {
-            LANDSCAPE.log(&SceneUpdate::default());
-        } else {
-            LANDSCAPE.log(&self.scene_update);
-            self.landing_zone.log_scene();
-        }
+        LANDSCAPE.log(&self.scene_update);
+        self.landing_zone.log_scene();
     }
 }

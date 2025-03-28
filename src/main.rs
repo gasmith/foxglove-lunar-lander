@@ -31,7 +31,6 @@ use tempfile::NamedTempFile;
 
 static_typed_channel!(FT, "/ft", FrameTransforms);
 
-const WAIT_DURATION: Duration = Duration::from_millis(200);
 const GAME_STEP_DURATION: Duration = Duration::from_millis(33);
 
 #[tokio::main]
@@ -79,7 +78,7 @@ async fn game_iter(
     // Initialize game state.
     let seed = params.next_seed();
     let mut rng = ChaCha8Rng::seed_from_u64(seed);
-    let mut landscape = Landscape::new(&mut rng, params);
+    let landscape = Landscape::new(&mut rng, params);
     let mut lander = Lander::new(
         landscape.lander_init_position(),
         params.lander_init_vertical_velocity(),
@@ -87,18 +86,17 @@ async fn game_iter(
         params.landing_zone_radius(),
     );
 
-    // Clear state, hide landscape, but ensure the channel is populated.
+    // Clear state, log scene once.
     LandingReport::clear();
     controls.soft_reset();
-    landscape.set_hidden(true);
+    log_scene_static(&landscape, &lander);
 
     // Print a banner to tell the user to press start and wait.
     let banner = Banner::press_start();
     while !controls.get_reset_requested() {
         log_frame_transforms(&landscape, &lander, Some(&banner));
-        log_scene_static(&landscape, &lander);
         banner.log_scene();
-        tokio::time::sleep(WAIT_DURATION).await;
+        tokio::time::sleep(GAME_STEP_DURATION).await;
     }
 
     Banner::clear_scene();
@@ -110,7 +108,6 @@ async fn game_iter(
     let mcap_writer = McapWriter::new().create(BufWriter::new(recording)).unwrap();
 
     // Log landscape and lander once at the beginning of the game.
-    landscape.set_hidden(false);
     log_scene_static(&landscape, &lander);
 
     // Main game loop.
@@ -146,10 +143,9 @@ async fn game_iter(
     lander.stop();
     while !controls.get_reset_requested() {
         log_frame_transforms(&landscape, &lander, Some(&banner));
-        log_scene_static(&landscape, &lander);
         banner.log_scene();
         report.log();
-        tokio::time::sleep(WAIT_DURATION).await;
+        tokio::time::sleep(GAME_STEP_DURATION).await;
     }
 
     Ok(())
