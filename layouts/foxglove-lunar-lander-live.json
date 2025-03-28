@@ -140,6 +140,9 @@
         },
         "frame:landscape": {
           "visible": false
+        },
+        "frame:banner": {
+          "visible": false
         }
       },
       "topics": {
