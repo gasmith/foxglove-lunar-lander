@@ -99,19 +99,23 @@
       "foxglovePanelTitle": "Angular velocity",
       "yAxisLabel": "radian/s"
     },
+    "Foxglove Navball.Navball!17r9jnb": {
+      "topic": "/lander_orientation",
+      "course_topic": "/lander_course"
+    },
     "3D!2un5fuq": {
       "cameraState": {
-        "distance": 19.99999999999999,
+        "distance": 20,
         "perspective": true,
-        "phi": 36.29999999999998,
+        "phi": 30,
         "target": [
           0,
           0,
           0
         ],
         "targetOffset": [
-          0.03918484545054792,
-          -0.09393185982035646,
+          0,
+          0,
           0
         ],
         "targetOrientation": [
@@ -151,6 +155,9 @@
         },
         "/banner": {
           "visible": true
+        },
+        "/scene": {
+          "visible": true
         }
       },
       "layers": {
@@ -189,16 +196,15 @@
     },
     "3D!4gxmqi7": {
       "cameraState": {
+        "distance": 100,
         "perspective": false,
-        "distance": 79.89004262316497,
         "phi": 76.90391335133191,
-        "thetaOffset": 90,
-        "targetOffset": [
-          0.3530468152696965,
-          -14.91597929044879,
-          1.5175978395708938
-        ],
         "target": [
+          0,
+          0,
+          0
+        ],
+        "targetOffset": [
           0,
           0,
           0
@@ -209,6 +215,7 @@
           0,
           1
         ],
+        "thetaOffset": 90,
         "fovy": 45,
         "near": 0.5,
         "far": 5000
@@ -276,7 +283,7 @@
       "paths": [
         {
           "timestampMethod": "receiveTime",
-          "value": "/lander_fuel_mass.value",
+          "value": "/lander_metrics.fuel_mass",
           "enabled": true,
           "color": "#da4fe3",
           "label": "fuel"
@@ -298,7 +305,7 @@
       "paths": [
         {
           "timestampMethod": "receiveTime",
-          "value": "/lander_ft.translation.z",
+          "value": "/lander_metrics.altitude",
           "enabled": true,
           "color": "#f7df71",
           "label": "z",
@@ -321,7 +328,7 @@
       "paths": [
         {
           "timestampMethod": "receiveTime",
-          "value": "/lander_vertical_velocity_target.value",
+          "value": "/lander_metrics.vertical_velocity_target",
           "enabled": true,
           "color": "#4e98e2",
           "label": "target"
@@ -435,9 +442,6 @@
           "layout": "Parameters!34toibq"
         }
       ]
-    },
-    "Foxglove Navball.Navball!17r9jnb": {
-      "topic": "/lander_orientation"
     }
   },
   "globalVariables": {},
