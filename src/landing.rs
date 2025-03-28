@@ -17,19 +17,31 @@ static REMARKS: LazyLock<HashMap<LandingCriterionType, Vec<&'static str>>> = Laz
         ),
         (
             LandingCriterionType::HorizontalSpeed,
-            vec!["You landed... sideways. The ground wasn't ready for that level of enthusiasm."],
+            vec![
+                "You landed... sideways. The ground wasn't ready for that level of enthusiasm.",
+                "The lander skidded across the surface in the least graceful way imaginable.",
+            ],
         ),
         (
             LandingCriterionType::Tilt,
-            vec!["You came in like a majestic leaning tower of 'nope'."],
+            vec![
+                "You came in like a majestic leaning tower of 'nope'.",
+                "Did you think that landing sideways was a good idea?",
+            ],
         ),
         (
             LandingCriterionType::AngularSpeed,
-            vec!["You were still spinning on landing. Were you trying for a celebratory twirl?"],
+            vec![
+                "You were still spinning on landing. Were you trying for a celebratory twirl?",
+                "Angular momentum has left the chat... along with structural integrity.",
+            ],
         ),
         (
             LandingCriterionType::DistanceFromTarget,
-            vec!["You stuck the landing - on the wrong part of the moon."],
+            vec![
+                "You stuck the landing - on the wrong part of the moon.",
+                "Perhaps you were holding the map upside-down?",
+            ],
         ),
     ]
     .into_iter()
