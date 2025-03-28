@@ -65,6 +65,9 @@ You'll want a gamepad. If you're using a PS4 controller, the controls are:
 - PS button: Start or reset
 
 You might find that your controller's button mappings are different from mine.
+If that's the case, you can write your own [`gamepad.json`](gamepad-ps4.json).
+You can use the joystick panel's "Auto-generated" display to figure out which
+indexes correspond to the physical axes and buttons that you want to use.
 
 ## Recorded games
 
@@ -84,5 +87,4 @@ accordingly](https://docs.foxglove.dev/docs/settings#desktop-app).
 ## Unfinished business
 
 - Attitude control assistance
-- Persistent button mapping config
 - Embed model data in the /lander channel

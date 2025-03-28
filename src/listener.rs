@@ -1,18 +1,17 @@
 use std::sync::Arc;
 
 use foxglove::websocket::{Client, ClientChannel, ServerListener};
-use glam::{Vec2, Vec3};
-use serde::Deserialize;
 
 use crate::controls::Controls;
+use crate::gamepad::GamepadMsg;
 use crate::parameters::Parameters;
 
 pub struct Listener {
-    params: Parameters,
-    controls: Controls,
+    params: Arc<Parameters>,
+    controls: Arc<Controls>,
 }
 impl Listener {
-    pub fn new(params: Parameters, controls: Controls) -> Self {
+    pub fn new(params: Arc<Parameters>, controls: Arc<Controls>) -> Self {
         Self { params, controls }
     }
 
@@ -39,13 +38,7 @@ impl ServerListener for Listener {
                 return;
             }
         };
-        self.controls.update(
-            msg.reset(),
-            msg.strafe(),
-            msg.rotate(),
-            msg.inc_vertical_velocity(),
-            msg.dec_vertical_velocity(),
-        );
+        self.controls.update_from_msg(&msg);
     }
 
     fn on_get_parameters(
@@ -64,81 +57,5 @@ impl ServerListener for Listener {
         _request_id: Option<&str>,
     ) -> Vec<foxglove::websocket::Parameter> {
         self.params.set(params)
-    }
-}
-
-#[derive(Debug, Deserialize)]
-struct GamepadMsg {
-    axes: Vec<f32>,
-    buttons: Vec<f32>,
-}
-
-#[allow(dead_code)]
-impl GamepadMsg {
-    const JOY_LX: usize = 0;
-    const JOY_LY: usize = 1;
-    const JOY_RX: usize = 2;
-    const JOY_RY: usize = 3;
-    const BUTTON_X: usize = 0;
-    const BUTTON_O: usize = 1;
-    const BUTTON_S: usize = 2;
-    const BUTTON_T: usize = 3;
-    const BUTTON_L1: usize = 4;
-    const BUTTON_R1: usize = 5;
-    const BUTTON_L2: usize = 6;
-    const BUTTON_R2: usize = 7;
-    const BUTTON_UP: usize = 12;
-    const BUTTON_DOWN: usize = 13;
-    const BUTTON_LEFT: usize = 14;
-    const BUTTON_RIGHT: usize = 15;
-    const BUTTON_PS: usize = 16;
-    const JOY_DEAD_ZONE_TOL: f32 = 0.10;
-
-    fn reset(&self) -> bool {
-        self.buttons[Self::BUTTON_PS] > 0.0
-    }
-
-    fn read_axes(&self, idx: usize) -> f32 {
-        let raw = self.axes[idx];
-        if raw.abs() < Self::JOY_DEAD_ZONE_TOL {
-            0.0
-        } else {
-            raw.clamp(-1.0, 1.0)
-        }
-    }
-
-    fn strafe(&self) -> Vec2 {
-        Vec2 {
-            x: self.read_axes(Self::JOY_LX),
-            y: self.read_axes(Self::JOY_LY),
-        }
-    }
-
-    fn pitch(&self) -> f32 {
-        -self.read_axes(Self::JOY_RY)
-    }
-
-    fn roll(&self) -> f32 {
-        -self.read_axes(Self::JOY_RX)
-    }
-
-    fn yaw(&self) -> f32 {
-        (self.buttons[Self::BUTTON_L2] - self.buttons[Self::BUTTON_R2]) / 2.0
-    }
-
-    fn rotate(&self) -> Vec3 {
-        Vec3 {
-            x: self.pitch(),
-            y: self.roll(),
-            z: self.yaw(),
-        }
-    }
-
-    fn inc_vertical_velocity(&self) -> bool {
-        self.buttons[Self::BUTTON_UP] > 0.0
-    }
-
-    fn dec_vertical_velocity(&self) -> bool {
-        self.buttons[Self::BUTTON_DOWN] > 0.0
     }
 }

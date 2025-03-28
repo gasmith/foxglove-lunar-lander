@@ -1,0 +1,13 @@
+{
+  "map": {
+    "axis_strafe_x": 0,
+    "axis_strafe_y": 1,
+    "axis_roll": 2,
+    "axis_pitch": 3,
+    "button_yaw_left": 6,
+    "button_yaw_right": 7,
+    "button_vertical_velocity_up": 12,
+    "button_vertical_velocity_down": 13,
+    "button_start": 16
+  }
+}

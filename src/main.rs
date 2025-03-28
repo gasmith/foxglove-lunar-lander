@@ -1,5 +1,6 @@
 use std::io::BufWriter;
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
 use std::time::Duration;
 
 use anyhow::Context;
@@ -8,6 +9,7 @@ use chrono::Utc;
 use foxglove::schemas::FrameTransforms;
 use foxglove::websocket::Capability;
 use foxglove::{McapWriter, WebSocketServer, static_typed_channel};
+use gamepad::Gamepad;
 use landing::LandingReport;
 use rand::prelude::*;
 use rand_chacha::ChaCha8Rng;
@@ -16,6 +18,7 @@ mod assets;
 mod banner;
 mod controls;
 mod convert;
+mod gamepad;
 mod lander;
 mod landing;
 mod landscape;
@@ -36,13 +39,14 @@ const GAME_STEP_DURATION: Duration = Duration::from_millis(33);
 #[tokio::main]
 async fn main() {
     if let Err(e) = fallible_main().await {
-        eprintln!("fatal: {e}");
+        eprintln!("fatal: {e:?}");
     }
 }
 
 async fn fallible_main() -> anyhow::Result<()> {
-    let params = Parameters::default();
-    let controls = Controls::default();
+    let params = Arc::new(Parameters::default());
+    let gamepad = Gamepad::from_json_file("gamepad.json")?;
+    let controls = Arc::new(Controls::new(gamepad));
     let recordings_dir = PathBuf::from("./recordings");
     if !recordings_dir.exists() {
         std::fs::create_dir_all(&recordings_dir).context("failed to create recordings dir")?;
@@ -62,7 +66,7 @@ async fn fallible_main() -> anyhow::Result<()> {
     Ok(())
 }
 
-async fn game_loop(recordings_dir: PathBuf, params: Parameters, controls: Controls) {
+async fn game_loop(recordings_dir: PathBuf, params: Arc<Parameters>, controls: Arc<Controls>) {
     loop {
         if let Err(e) = game_iter(&recordings_dir, &params, &controls).await {
             eprintln!("game aborted: {e}");

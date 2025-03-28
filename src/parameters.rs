@@ -1,6 +1,6 @@
+use std::collections::HashMap;
 use std::fmt::Debug;
 use std::ops::Range;
-use std::{collections::HashMap, sync::Arc};
 
 use bytes::Buf;
 use foxglove::websocket::{Parameter, ParameterType, ParameterValue};
@@ -88,8 +88,8 @@ fn default_values() -> HashMap<String, Value> {
         .collect()
 }
 
-#[derive(Default, Clone)]
-pub struct Parameters(Arc<RwLock<Registry>>);
+#[derive(Default)]
+pub struct Parameters(RwLock<Registry>);
 
 impl Parameters {
     pub fn next_seed(&self) -> u64 {

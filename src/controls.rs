@@ -1,30 +1,67 @@
-use std::{
-    sync::Arc,
-    time::{Duration, Instant},
-};
+use std::time::{Duration, Instant};
 
 use glam::{Vec2, Vec3};
 use parking_lot::RwLock;
 
-#[derive(Default, Clone)]
-pub struct Controls(Arc<RwLock<Inner>>);
+use crate::gamepad::{Gamepad, GamepadMsg};
+
+pub struct Controls {
+    gamepad: Gamepad,
+    state: RwLock<State>,
+}
 impl Controls {
+    pub fn new(gamepad: Gamepad) -> Self {
+        Self {
+            gamepad,
+            state: Default::default(),
+        }
+    }
+
+    pub fn update_from_msg(&self, msg: &GamepadMsg) {
+        let mut state = self.state.write();
+        state.reset.update(self.gamepad.read_start(msg));
+        state.strafe = Vec2 {
+            x: self.gamepad.read_strafe_x(msg),
+            y: self.gamepad.read_strafe_y(msg),
+        };
+        // should use Button::with_repeat?
+        let yaw = match (
+            self.gamepad.read_yaw_left(msg),
+            self.gamepad.read_yaw_right(msg),
+        ) {
+            (true, false) => 0.5,
+            (false, true) => -0.5,
+            _ => 0.0,
+        };
+        state.rotate = Vec3 {
+            x: self.gamepad.read_pitch(msg),
+            y: self.gamepad.read_roll(msg),
+            z: yaw,
+        };
+        state
+            .vertical_velocity_up
+            .update(self.gamepad.read_vertical_velocity_up(msg));
+        state
+            .vertical_velocity_down
+            .update(self.gamepad.read_vertical_velocity_down(msg));
+    }
+
     pub fn strafe(&self) -> Vec2 {
-        self.0.read().strafe
+        self.state.read().strafe
     }
 
     pub fn rotate(&self) -> Vec3 {
-        self.0.read().rotate
+        self.state.read().rotate
     }
 
     pub fn get_and_reset_vertical_velocity_delta(&self) -> f32 {
-        let mut inner = self.0.write();
-        0.2 * (inner.inc_vertical_velocity.get_and_reset() as f32
-            - inner.dec_vertical_velocity.get_and_reset() as f32)
+        let mut state = self.state.write();
+        0.2 * (state.vertical_velocity_up.get_and_reset() as f32
+            - state.vertical_velocity_down.get_and_reset() as f32)
     }
 
     pub fn get_reset_requested(&self) -> bool {
-        self.0.read().reset.get() > 0
+        self.state.read().reset.get() > 0
     }
 
     /// Resets all values and button-press state.
@@ -38,47 +75,31 @@ impl Controls {
     }
 
     fn reset(&self, hard: bool) {
-        let mut inner = self.0.write();
+        let mut inner = self.state.write();
         inner.reset.reset(hard);
         inner.strafe = Vec2::ZERO;
         inner.rotate = Vec3::ZERO;
-        inner.inc_vertical_velocity.reset(hard);
-        inner.dec_vertical_velocity.reset(hard);
-    }
-
-    pub fn update(
-        &self,
-        reset: bool,
-        strafe: Vec2,
-        rotate: Vec3,
-        inc_vertical_velocity: bool,
-        dec_vertical_velocity: bool,
-    ) {
-        let mut inner = self.0.write();
-        inner.reset.update(reset);
-        inner.strafe = strafe;
-        inner.rotate = rotate;
-        inner.inc_vertical_velocity.update(inc_vertical_velocity);
-        inner.dec_vertical_velocity.update(dec_vertical_velocity);
+        inner.vertical_velocity_up.reset(hard);
+        inner.vertical_velocity_down.reset(hard);
     }
 }
 
-struct Inner {
+struct State {
     reset: Button,
     strafe: Vec2,
     rotate: Vec3,
-    inc_vertical_velocity: Button,
-    dec_vertical_velocity: Button,
+    vertical_velocity_up: Button,
+    vertical_velocity_down: Button,
 }
-impl Default for Inner {
+impl Default for State {
     fn default() -> Self {
         let repeat = Duration::from_millis(100);
         Self {
             reset: Button::default(),
             strafe: Vec2::default(),
             rotate: Vec3::default(),
-            inc_vertical_velocity: Button::with_repeater(repeat),
-            dec_vertical_velocity: Button::with_repeater(repeat),
+            vertical_velocity_up: Button::with_repeater(repeat),
+            vertical_velocity_down: Button::with_repeater(repeat),
         }
     }
 }
