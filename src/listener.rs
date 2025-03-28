@@ -2,8 +2,7 @@ use std::sync::Arc;
 
 use foxglove::websocket::{Client, ClientChannel, ServerListener};
 
-use crate::controls::Controls;
-use crate::gamepad::GamepadMsg;
+use crate::controls::{Controls, GamepadMsg};
 use crate::parameters::Parameters;
 
 pub struct Listener {

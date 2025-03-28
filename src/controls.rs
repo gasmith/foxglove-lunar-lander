@@ -3,7 +3,8 @@ use std::time::{Duration, Instant};
 use glam::{Vec2, Vec3};
 use parking_lot::RwLock;
 
-use crate::gamepad::{Gamepad, GamepadMsg};
+mod gamepad;
+pub use gamepad::{Gamepad, GamepadMsg};
 
 pub struct Controls {
     gamepad: Gamepad,
