@@ -1,7 +1,9 @@
 # Foxglove Lunar Lander Simulator
 
 This is a lunar lander simulator that uses the Foxglove app as its UI.
-The simulator is written against the Foxglove SDK, as a way to demo some of its functionality.
+The simulator is written against the [Foxglove
+SDK](https://github.com/foxglove/foxglove-sdk), as a way to demo some of its
+functionality.
 
 In this game, you're piloting an Apollo lunar lander.
 
