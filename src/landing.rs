@@ -1,10 +1,10 @@
 use std::{collections::HashMap, sync::LazyLock};
 
-use foxglove::static_typed_channel;
+use foxglove::LazyChannel;
 use rand::seq::IndexedRandom;
 use serde::Serialize;
 
-static_typed_channel!(LANDING_REPORT, "/landing_report", LandingReportMsg);
+static LANDING_REPORT: LazyChannel<LandingReportMsg> = LazyChannel::new("/landing_report");
 
 static REMARKS: LazyLock<HashMap<LandingCriterionType, Vec<&'static str>>> = LazyLock::new(|| {
     [

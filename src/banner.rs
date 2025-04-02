@@ -1,11 +1,11 @@
+use foxglove::LazyChannel;
 use foxglove::schemas::{
     Color, FrameTransform, SceneEntity, SceneEntityDeletion, SceneUpdate, TextPrimitive, Vector3,
 };
-use foxglove::static_typed_channel;
 
 use crate::landing::LandingStatus;
 
-static_typed_channel!(BANNER, "/banner", SceneUpdate);
+static BANNER: LazyChannel<SceneUpdate> = LazyChannel::new("/banner");
 
 #[derive(Default)]
 pub struct Banner(SceneUpdate);

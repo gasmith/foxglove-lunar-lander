@@ -1,12 +1,12 @@
+use foxglove::LazyChannel;
 use foxglove::schemas::{
     Color, FrameTransform, SceneEntity, SceneUpdate, SpherePrimitive, Vector3,
 };
-use foxglove::static_typed_channel;
 use glam::Vec3;
 
 use crate::convert::IntoFg;
 
-static_typed_channel!(LANDING_ZONE, "/landing_zone", SceneUpdate);
+static LANDING_ZONE: LazyChannel<SceneUpdate> = LazyChannel::new("/landing_zone");
 
 pub struct LandingZone {
     frame_transform: FrameTransform,
@@ -19,7 +19,7 @@ impl From<Vec3> for LandingZone {
 }
 impl LandingZone {
     pub fn new(center: Vec3) -> Self {
-        let _ = *LANDING_ZONE;
+        LANDING_ZONE.init();
         let frame_transform = FrameTransform {
             parent_frame_id: "landscape".into(),
             child_frame_id: "landing_zone".into(),

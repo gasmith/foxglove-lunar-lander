@@ -1,7 +1,7 @@
+use foxglove::LazyChannel;
 use foxglove::schemas::{
     FrameTransform, ModelPrimitive, Pose, Quaternion, SceneEntity, SceneUpdate, Vector3,
 };
-use foxglove::static_typed_channel;
 use glam::{EulerRot, Quat, Vec2, Vec3};
 use serde::Serialize;
 
@@ -19,22 +19,20 @@ struct LanderMetrics {
     vertical_velocity_target: f64,
 }
 
-static_typed_channel!(LANDER, "/lander", SceneUpdate);
-static_typed_channel!(LANDER_ANGULAR_VELOCITY, "/lander_angular_velocity", Vector3);
-static_typed_channel!(LANDER_COURSE, "/lander_course", Vector3);
-static_typed_channel!(LANDER_METRICS, "/lander_metrics", LanderMetrics);
-static_typed_channel!(LANDER_ORIENTATION, "/lander_orientation", Quaternion);
-static_typed_channel!(LANDER_VELOCITY, "/lander_velocity", Vector3);
+static LANDER: LazyChannel<SceneUpdate> = LazyChannel::new("/lander");
+static LANDER_ANGULAR_VELOCITY: LazyChannel<Vector3> = LazyChannel::new("/lander_angular_velocity");
+static LANDER_COURSE: LazyChannel<Vector3> = LazyChannel::new("/lander_course");
+static LANDER_METRICS: LazyChannel<LanderMetrics> = LazyChannel::new("/lander_metrics");
+static LANDER_ORIENTATION: LazyChannel<Quaternion> = LazyChannel::new("/lander_orientation");
+static LANDER_VELOCITY: LazyChannel<Vector3> = LazyChannel::new("/lander_velocity");
 
 fn init_channels() {
-    let _ = (
-        &*LANDER,
-        &*LANDER_ANGULAR_VELOCITY,
-        &*LANDER_COURSE,
-        &*LANDER_METRICS,
-        &*LANDER_ORIENTATION,
-        &*LANDER_VELOCITY,
-    );
+    LANDER.init();
+    LANDER_ANGULAR_VELOCITY.init();
+    LANDER_COURSE.init();
+    LANDER_METRICS.init();
+    LANDER_ORIENTATION.init();
+    LANDER_VELOCITY.init();
 }
 
 /// Base mass for the apollo lander.

@@ -9,7 +9,7 @@ use chrono::Utc;
 use controls::Gamepad;
 use foxglove::schemas::FrameTransforms;
 use foxglove::websocket::Capability;
-use foxglove::{McapWriter, WebSocketServer, static_typed_channel};
+use foxglove::{LazyChannel, McapWriter, WebSocketServer};
 use landing::LandingReport;
 use rand::prelude::*;
 use rand_chacha::ChaCha8Rng;
@@ -31,7 +31,7 @@ use listener::Listener;
 use parameters::Parameters;
 use tempfile::NamedTempFile;
 
-static_typed_channel!(FT, "/ft", FrameTransforms);
+static FT: LazyChannel<FrameTransforms> = LazyChannel::new("/ft");
 
 const GAME_STEP_DURATION: Duration = Duration::from_millis(33);
 

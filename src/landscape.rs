@@ -1,5 +1,5 @@
+use foxglove::LazyChannel;
 use foxglove::schemas::{FrameTransform, SceneUpdate, Vector3};
-use foxglove::static_typed_channel;
 use glam::Vec3;
 use rand::prelude::*;
 
@@ -10,7 +10,7 @@ use landing_zone::LandingZone;
 
 use crate::parameters::Parameters;
 
-static_typed_channel!(LANDSCAPE, "/landscape", SceneUpdate);
+static LANDSCAPE: LazyChannel<SceneUpdate> = LazyChannel::new("/landscape");
 
 pub struct Landscape {
     frame_transform: FrameTransform,
@@ -20,7 +20,7 @@ pub struct Landscape {
 }
 impl Landscape {
     pub fn new<R: Rng>(rng: &mut R, params: &Parameters) -> Self {
-        let _ = *LANDSCAPE;
+        LANDSCAPE.init();
         let mut height_map = HeightMap::new(rng, params.landscape_width());
         let landing_zone_center = height_map.create_random_landing_zone(
             rng,
